@@ -74,7 +74,16 @@ class MyColors {
 
   static const Color color_F5F5F5 = Color(0xFFF5F5F5);
 
-  static const Color color_CDD1DD=Color(0xFFCDD1DD);
+  static const Color color_CDD1DD = Color(0xFFCDD1DD);
+
+  static const Color color_0DCCCCCC = Color(0xFF0DCCCCCC);
+
+  static const Color color_010A29 = Color(0xFF010A29);
+
+  static const Color color_DFE6FD = Color(0xFFDFE6FD);
+
+  static const Color color_585D7B=Color(0xFF585D7B);
+
 }
 
 Map<String, Color> circleAvatarMap = {

@@ -6,6 +6,8 @@ import 'package:ark/base/application.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/routers/routers.dart';
 import 'package:ark/utils/log_utils.dart';
+import 'package:ark/views/login.dart';
+import 'package:ark/views/mian_project.dart';
 import 'package:ark/views/project_list.dart';
 import 'package:ark/views/splash_page.dart';
 import 'package:fluro/fluro.dart';
@@ -38,9 +40,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String login = SpUtil.getString(SpConstants.is_Login);
-    print('未登录 ${login}');
-    bool notLogin = TextUtil.isEmpty(login);
+    bool login = SpUtil.getBool(SpConstants.is_Login);
     return OKToast(
         child: MaterialApp(
           title: '方舟2.0',
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           navigatorKey: NavKey.navKey,
-          home: notLogin ? SplashPage() : ProjectListPage(),
+          home: login ? MainProject() : Login(),
         ),
 
         /// Toast 配置

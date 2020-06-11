@@ -18,6 +18,7 @@ class AuthInterceptor extends Interceptor {
     if (cookie.isNotEmpty) {
       options.headers['Cookie'] = cookie;
     }
+    print('xiaopeng $cookie');
     return super.onRequest(options);
   }
 }

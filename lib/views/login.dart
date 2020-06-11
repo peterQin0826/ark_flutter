@@ -1,10 +1,16 @@
 import 'dart:collection';
 
 import 'package:ark/bean/login_model.dart';
+import 'package:ark/common/sp_constant.dart';
 import 'package:ark/net/dio_utils.dart';
 import 'package:ark/net/http_api.dart';
+import 'package:ark/net/http_method.dart';
 import 'package:ark/res/colors.dart';
+import 'package:ark/routers/fluro_navigator.dart';
+import 'package:ark/routers/routers.dart';
 import 'package:ark/utils/utils.dart';
+import 'package:fluro/fluro.dart';
+import 'package:flustars/flustars.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -83,12 +89,25 @@ class LoginState extends State<Login> {
                     padding: EdgeInsets.only(top: 50, left: 35, right: 35),
                     child: GestureDetector(
                       onTap: () {
-                        DioUtils.instance.asyncRequestNetwork<LoginModel>(
-                            Method.post, HttpApi.login, params: {
+                        print('打印参数：${userName.text} ==>${password.text}');
+                        DioUtils.instance.request(
+                            HttpMethod.POST, HttpApi.login, params: {
                           "username": userName.text,
                           "password": password.text
-                        }, onSuccess: (data) {
-                          print('登录请求成功');
+                        }, success: (data) {
+                          LoginModel login = LoginModel.fromJson(data);
+                          print('请求成功：${"sessionid=" + login.sessionId}');
+                          SpUtil.putString(SpConstants.cookie,
+                              "sessionid=" + login.sessionId);
+                          SpUtil.putString(
+                              SpConstants.user_name, login.userName);
+                          SpUtil.putString(SpConstants.user_img, login.image);
+                          SpUtil.putString(SpConstants.user_key, login.userKey);
+                          SpUtil.putBool(SpConstants.is_Login, true);
+                          NavigatorUtils.push(context, Routers.main,
+                              replace: true, clearStack: true);
+                        }, error: (e) {
+                          print('请求失败：${e.toString()}');
                         });
                       },
                       child: FractionallySizedBox(

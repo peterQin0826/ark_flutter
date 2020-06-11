@@ -1,4 +1,9 @@
+import 'dart:html';
+
 import 'package:ark/common/sp_constant.dart';
+import 'package:ark/net/dio_utils.dart';
+import 'package:ark/net/http_api.dart';
+import 'package:ark/net/http_method.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/routers/routers.dart';
@@ -106,13 +111,44 @@ class MyLoginState extends State<MyLogin> {
             case 4:
               break;
             case 5:
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('提示'),
+                      content: Text('您要退出应用吗？'),
+                      actions: <Widget>[
+                        FlatButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('取消'),
+                        ),
+                        FlatButton(
+                          onPressed: () {
+                            DioUtils.instance
+                                .request(HttpMethod.GET, HttpApi.logout,
+                                success: (data) {
+                                  Navigator.of(context).pop(true);
+                                  SpUtil.clear();
+                                  NavigatorUtils.push(
+                                      context, Routers.login, replace: true,
+                                      clearStack: true);
+                                }, error: (e) {
+                                  LogUtil.e('xioapeng,异常${e.toString()}');
+                                });
+                          },
+                          child: Text('确定'),
+                        )
+                      ],
+                    );
+                  });
               break;
           }
-          print('object');
         },
         child: Padding(
           padding:
-              EdgeInsets.only(left: 15, right: 15, top: pos == 1 ? 30 : 20),
+          EdgeInsets.only(left: 15, right: 15, top: pos == 1 ? 30 : 20),
           child: Column(
             children: <Widget>[
               Flex(

@@ -1,8 +1,11 @@
 import 'dart:convert';
 
 import 'package:ark/base/nav_key.dart';
+import 'package:ark/bean/base/base_list_entity.dart';
+import 'package:ark/bean/base/error_entity.dart';
 import 'package:ark/common/api_constant.dart';
 import 'package:ark/common/common.dart';
+import 'package:ark/net/http_method.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/routers/routers.dart';
 import 'package:ark/utils/log_utils.dart';
@@ -13,7 +16,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
-import 'base_entity.dart';
+import '../bean/base/base_entity.dart';
 import 'error_handle.dart';
 import 'intercept.dart';
 
@@ -41,6 +44,7 @@ class DioUtils {
         // 不使用http状态码判断状态，使用AdapterInterceptor来处理（适用于标准REST风格）
         return true;
       },
+      contentType: Headers.formUrlEncodedContentType,
       baseUrl: ApiConstant.HOST,
     );
     _dio = Dio(options);
@@ -58,8 +62,142 @@ class DioUtils {
     _dio.interceptors.add(AdapterInterceptor());
   }
 
+  // 请求，返回参数为 T
+  // method：请求方法，NWMethod.POST等
+  // path：请求地址
+  // params：请求参数
+  // success：请求成功回调
+  // error：请求失败回调
+  Future request(HttpMethod method, String path,
+      {dynamic params,
+      Map<String, dynamic> queryParameters,
+      bool isList = false,
+      Function(Map<String, dynamic>) success,
+      Function(List<dynamic>) successList,
+      Function(ErrorEntity) error}) async {
+    try {
+      Response response = await _dio.request(path,
+          data: params,
+          queryParameters: queryParameters,
+          options: Options(method: HttpMethodValues[method]));
+      if (response != null) {
+        print('查看返回结果：${response.data}');
+        Map<String, dynamic> json = parseData(response.data.toString());
+        int code = json['code'];
+        if (code == 0) {
+          Map<String, dynamic> responseData = json['data'];
+          int status = responseData['status'];
+          String message = responseData['message'];
+
+          List<dynamic> finalResponse;
+
+//         print('返回结果${responseData['resultObj']}');
+          switch (status) {
+
+            /// 软登录
+            case Constant.CODE_999:
+            case Constant.CODE_998:
+            case Constant.CODE_997:
+              Toast.show(message);
+//              _onSoftLogin(message);
+              break;
+
+            /// 强制登录 todo 有问题
+            case Constant.CODE_995:
+              NavigatorUtils.push(NavKey.navKey.currentContext, Routers.login);
+              break;
+            case Constant.CODE_SUCCESS:
+              if (isList) {
+                successList(responseData['resultObj']);
+              } else {
+                success(responseData['resultObj']);
+              }
+              break;
+            default:
+              Toast.show(message);
+              break;
+          }
+        }
+      } else {
+        error(ErrorEntity(status: -1, message: "未知错误"));
+      }
+    } on DioError catch (e) {
+      error(createErrorEntity(e));
+    }
+  }
+
+  // 请求，返回参数为 List
+  // method：请求方法，NWMethod.POST等
+  // path：请求地址
+  // params：请求参数
+  // success：请求成功回调
+  // error：请求失败回调
+  Future requestList<T>(HttpMethod method, String path,
+      {Map params,
+      Function(List<T>) success,
+      Function(ErrorEntity) error}) async {
+    try {
+      Response response = await _dio.request(path,
+          queryParameters: params,
+          options: Options(method: HttpMethodValues[method]));
+      if (response != null) {
+        BaseListEntity entity = BaseListEntity<T>.fromJson(response.data);
+        if (entity.code == 0) {
+          success(entity.data);
+        } else {
+          error(ErrorEntity(status: entity.code, message: entity.message));
+        }
+      } else {
+        error(ErrorEntity(status: -1, message: "未知错误"));
+      }
+    } on DioError catch (e) {
+      error(createErrorEntity(e));
+    }
+  }
+
+  // 错误信息
+  ErrorEntity createErrorEntity(DioError error) {
+    switch (error.type) {
+      case DioErrorType.CANCEL:
+        {
+          return ErrorEntity(status: -1, message: "请求取消");
+        }
+        break;
+      case DioErrorType.CONNECT_TIMEOUT:
+        {
+          return ErrorEntity(status: -1, message: "连接超时");
+        }
+        break;
+      case DioErrorType.SEND_TIMEOUT:
+        {
+          return ErrorEntity(status: -1, message: "请求超时");
+        }
+        break;
+      case DioErrorType.RECEIVE_TIMEOUT:
+        {
+          return ErrorEntity(status: -1, message: "响应超时");
+        }
+        break;
+      case DioErrorType.RESPONSE:
+        {
+          try {
+            int errCode = error.response.statusCode;
+            String errMsg = error.response.statusMessage;
+            return ErrorEntity(status: errCode, message: errMsg);
+          } on Exception catch (_) {
+            return ErrorEntity(status: -1, message: "未知错误");
+          }
+        }
+        break;
+      default:
+        {
+          return ErrorEntity(status: -1, message: error.message);
+        }
+    }
+  }
+
   // 数据返回格式统一，统一处理异常
-  Future<BaseEntity<T>> _request<T>(String method, String url,
+  Future<T> _parseResponse<T>(String method, String url,
       {dynamic data,
       Map<String, dynamic> queryParameters,
       CancelToken cancelToken,
@@ -69,17 +207,19 @@ class DioUtils {
         queryParameters: queryParameters,
         options: _checkOptions(method, options),
         cancelToken: cancelToken);
-    try {
-      /// 集成测试无法使用 isolate
-      Map<String, dynamic> _map = Constant.isTest
-          ? parseData(response.data.toString())
-          : await compute(parseData, response.data.toString());
-      return BaseEntity.fromJson(_map);
-      // return _map;
-    } catch (e) {
-      print(e);
-      return BaseEntity(ExceptionHandle.parse_error, '数据解析错误', null);
-    }
+//    try {
+//      /// 集成测试无法使用 isolate
+//      Map<String, dynamic> _map = Constant.isTest
+//          ? parseData(response.data.toString())
+//          : await compute(parseData, response.data.toString());
+//      return BaseEntity.fromJson(_map);
+//      // return _map;
+//    } catch (e) {
+//      print(e);
+//      return BaseEntity(ExceptionHandle.parse_error, '数据解析错误', null);
+//    }
+    print('返回结果：${json.decode(response.data)}');
+    return json.decode(data);
   }
 
   Options _checkOptions(method, options) {
@@ -90,41 +230,41 @@ class DioUtils {
     return options;
   }
 
-  Future requestNetwork<T>(Method method, String url,
-      {Function(T t) onSuccess,
-      Function(List<T> list) onSuccessList,
-      Function(int code, String msg) onError,
-      dynamic params,
-      Map<String, dynamic> queryParameters,
-      CancelToken cancelToken,
-      Options options,
-      bool isList: false}) {
-    String m = _getRequestMethod(method);
-    return _request<T>(m, url,
-            data: params,
-            queryParameters: queryParameters,
-            options: options,
-            cancelToken: cancelToken)
-        .then((BaseEntity<T> result) {
-      if (result.status == 0) {
-        if (isList) {
-          if (onSuccessList != null) {
-            onSuccessList(result.listData);
-          }
-        } else {
-          if (onSuccess != null) {
-            onSuccess(result.resultObj);
-          }
-        }
-      } else {
-        _onError(result.status, result.message, onError);
-      }
-    }, onError: (e, _) {
-      _cancelLogPrint(e, url);
-      NetError error = ExceptionHandle.handleException(e);
-      _onError(error.code, error.msg, onError);
-    });
-  }
+//  Future requestNetwork<T>(Method method, String url,
+//      {Function(T t) onSuccess,
+//      Function(List<T> list) onSuccessList,
+//      Function(int code, String msg) onError,
+//      dynamic params,
+//      Map<String, dynamic> queryParameters,
+//      CancelToken cancelToken,
+//      Options options,
+//      bool isList: false}) {
+//    String m = _getRequestMethod(method);
+//    return _request<T>(m, url,
+//            data: params,
+//            queryParameters: queryParameters,
+//            options: options,
+//            cancelToken: cancelToken)
+//        .then((BaseEntity<T> result) {
+//      if (result.status == 0) {
+//        if (isList) {
+//          if (onSuccessList != null) {
+//            onSuccessList(result.listData);
+//          }
+//        } else {
+//          if (onSuccess != null) {
+//            onSuccess(result.resultObj);
+//          }
+//        }
+//      } else {
+//        _onError(result.status, result.message, onError);
+//      }
+//    }, onError: (e, _) {
+//      _cancelLogPrint(e, url);
+//      NetError error = ExceptionHandle.handleException(e);
+//      _onError(error.code, error.msg, onError);
+//    });
+//  }
 
   /// 统一处理(onSuccess返回T对象，onSuccessList返回List<T>)
   asyncRequestNetwork<T>(Method method, String url,
@@ -137,47 +277,15 @@ class DioUtils {
       Options options,
       bool isList: false}) {
     String m = _getRequestMethod(method);
-    Observable.fromFuture(_request<T>(m,  url,
+
+    Observable.fromFuture(_parseResponse<T>(m, url,
             data: params,
             queryParameters: queryParameters,
             options: options,
             cancelToken: cancelToken))
         .asBroadcastStream()
         .listen((result) {
-      switch (result.status) {
-
-        /// 软登录
-        case Constant.CODE_999:
-        case Constant.CODE_998:
-        case Constant.CODE_997:
-          _onSoftLogin(result.message);
-          break;
-
-        /// 强制登录 todo 有问题
-        case Constant.CODE_995:
-          NavigatorUtils.push(NavKey.navKey.currentContext, Routers.login);
-          break;
-        case Constant.CODE_SUCCESS:
-          if (isList) {
-            if (onSuccessList != null) {
-              onSuccessList(result.listData);
-            }
-          } else {
-            if (onSuccess != null) {
-              onSuccess(result.resultObj);
-            }
-          }
-          break;
-        default:
-          _onError(result.status, result.message, onError);
-          _onSoftLogin('失败回调');
-//          NavigatorUtils.push(NavKey.navKey.currentContext, Routers.login);
-          break;
-      }
-    }, onError: (e) {
-      _cancelLogPrint(e, url);
-      NetError error = ExceptionHandle.handleException(e);
-      _onError(error.code, error.msg, onError);
+      print('秦晓鹏=========>${result}');
     });
   }
 
