@@ -81,17 +81,13 @@ class DioUtils {
           queryParameters: queryParameters,
           options: Options(method: HttpMethodValues[method]));
       if (response != null) {
-        print('查看返回结果：${response.data}');
+//        print('查看返回结果：${response.data}');
         Map<String, dynamic> json = parseData(response.data.toString());
         int code = json['code'];
         if (code == 0) {
           Map<String, dynamic> responseData = json['data'];
           int status = responseData['status'];
           String message = responseData['message'];
-
-          List<dynamic> finalResponse;
-
-//         print('返回结果${responseData['resultObj']}');
           switch (status) {
 
             /// 软登录

@@ -1,20 +1,25 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:ark/base/nav_key.dart';
+import 'package:ark/bean/themeColorMap.dart';
 import 'package:ark/common/sp_constant.dart';
 import 'package:ark/base/application.dart';
+import 'package:ark/model/detail_pro_model.dart';
+import 'package:ark/provider/appinfo_provider.dart';
+import 'package:ark/provider_setup.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/routers/routers.dart';
+import 'package:ark/ui/login.dart';
+import 'package:ark/ui/mian_project.dart';
 import 'package:ark/utils/log_utils.dart';
-import 'package:ark/views/login.dart';
-import 'package:ark/views/mian_project.dart';
-import 'package:ark/views/project_list.dart';
-import 'package:ark/views/splash_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flustars/flustars.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
+
+import 'bean/theme_bean.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,25 +43,46 @@ class MyApp extends StatelessWidget {
     Application.router = router;
   }
 
+  Color _themeColor;
+
   @override
   Widget build(BuildContext context) {
     bool login = SpUtil.getBool(SpConstants.is_Login);
-    return OKToast(
-        child: MaterialApp(
-          title: '方舟2.0',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          navigatorKey: NavKey.navKey,
-          home: login ? MainProject() : Login(),
-        ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: AppInfoProvider()),
+        ChangeNotifierProvider(create: (_) =>DetailProModel(),)
+      ],
+      child: Consumer<AppInfoProvider>(
+        builder: (context, appinfo, _) {
+          String colorkey = appinfo.themeColor;
 
-        /// Toast 配置
-        backgroundColor: Colors.black54,
-        textPadding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-        radius: 20.0,
-        position: ToastPosition.bottom);
+          print('object=====>$colorkey');
+          if (TextUtil.isEmpty(colorkey)) {
+            colorkey='blue';
+          }
+          if (themeColorMap[colorkey] != null) {
+            _themeColor = themeColorMap[colorkey];
+          }
+          return OKToast(
+              child: MaterialApp(
+                title: '方舟2.0',
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  primaryColor: _themeColor,
+                ),
+                navigatorKey: NavKey.navKey,
+                home: login ? MainProject() : Login(),
+              ),
+
+              /// Toast 配置
+              backgroundColor: Colors.black54,
+              textPadding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              radius: 20.0,
+              position: ToastPosition.bottom);
+        },
+      ),
+    );
   }
 }

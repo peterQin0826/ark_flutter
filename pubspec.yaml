@@ -83,17 +83,31 @@ dependencies:
   flutter_secure_storage: ^3.3.1+1
   flutter_launcher_icons: ^0.7.3
   connectivity: ^0.4.4
+  pull_to_refresh: ^1.5.6
 
   event_bus: ^1.1.0
+  tree_view: ^0.0.5
 
   shared_preferences: ^0.5.6
   # 汉字转拼音库 https://github.com/flutterchina/lpinyin
   lpinyin: ^1.0.9
+  # 谁用谁闪亮
+  shimmer: ^1.0.0
+  # 复杂的网格布局
+  flutter_staggered_grid_view: "^0.3.1"
+  #官方视频播放器
+  video_player: ^0.10.11+1
+  open_iconic_flutter: ^0.3.0
+#  #第三方播放器
+#  chewie: ^0.9.10
 
-
-
-
-
+  screen: ^0.0.5
+  # 腾讯的播放器
+#  flutter_tencentplayer:
+#    git:
+#      url: https://github.com/qq326646683/flutter_tencentplayer.git
+  # 图表控件
+  syncfusion_flutter_charts: ^18.2.46
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -144,6 +158,38 @@ flutter:
     - assets/images/login_logo.png
     - assets/images/lock.png
     - assets/images/account.png
+    - assets/images/ic_back_black.png
+    - assets/images/ic_back_white.png
+    - assets/images/folder_close.png
+    - assets/images/folder.png
+    - assets/images/folder_open.png
+    - assets/images/folder_click_in.png
+    - assets/images/img_empty.png
+    - assets/images/edit_img.png
+    - assets/images/pro_title.png
+    - assets/images/click_in_grey.png
+    - assets/images/jz_play_normal.png
+    - assets/images/img_file_download.png
+    - assets/images/file_cad.png
+    - assets/images/file_doc.png
+    - assets/images/file_excel.png
+    - assets/images/file_gis.png
+    - assets/images/file_html.png
+    - assets/images/file_img.png
+    - assets/images/file_music.png
+    - assets/images/file_orc.png
+    - assets/images/file_pdf.png
+    - assets/images/file_ppt.png
+    - assets/images/file_txt.png
+    - assets/images/file_unknow.png
+    - assets/images/file_video.png
+    - assets/images/file_zip.png
+    - assets/images/img_relation_type.png
+    - assets/images/relation_add_blue.png
+    - assets/images/relation_search_blue.png
+    - assets/images/unknow.png
+    - assets/images/bftable_jian.png
+    - assets/images/bftable_jia.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

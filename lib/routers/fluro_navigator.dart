@@ -56,4 +56,27 @@ class NavigatorUtils {
   static goProjectList(BuildContext context) {
     push(context, Routers.project, replace: true, clearStack: true);
   }
+
+  static gotoProjectCatalog(BuildContext context, String proName) {
+    push(context,
+        '${Routers.project_catalog}?proName=${Uri.encodeComponent(proName)}');
+  }
+
+  static gotoObjectListView(BuildContext context, String code) {
+    push(context,
+        '${Routers.object_list_view}?code=${Uri.encodeComponent(code)}');
+  }
+
+  static gotoConceptDetail(BuildContext context, String code) {
+    push(context,
+        '${Routers.concept_detail}?code=${Uri.encodeComponent(code)}');
+  }
+
+  static gotoObjectDetail(BuildContext context,String objKey){
+    push(context, '${Routers.object_detail}?obj_key=${Uri.encodeComponent(objKey)}');
+  }
+
+  static gotoShortProEdit(BuildContext context,String objKey){
+    push(context, '${Routers.short_pro_edit}?obj_key=${Uri.decodeComponent(objKey)}');
+  }
 }

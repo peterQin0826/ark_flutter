@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ark/res/colors.dart';
 import 'package:ark/res/strings.dart';
 import 'package:common_utils/common_utils.dart';
@@ -5,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
 
 import 'commonUtils.dart';
-
 
 class Utils {
   static String getImgPath(String name, {String format: 'png'}) {
@@ -95,5 +96,19 @@ class Utils {
     } else {
       return LoadStatus.success;
     }
+  }
+
+  static Map<String, dynamic> parseData(String data) {
+    return json.decode(data);
+  }
+
+  static String getIndexName(String string, int index) {
+    if (string.contains('##')) {
+      List<String> strings = string.split('##');
+      if (index <= strings.length) {
+        return strings[index];
+      }
+    }
+    return "";
   }
 }

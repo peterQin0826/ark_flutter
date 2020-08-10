@@ -16,6 +16,8 @@ class Constant {
   static const String phone = 'phone';
   static const String accessToken = 'accessToken';
   static const String refreshToken = 'refreshToken';
+  //视频封面的后缀
+  static final String videoCover = "_1_cover";
 
   static const String theme = 'AppTheme';
 

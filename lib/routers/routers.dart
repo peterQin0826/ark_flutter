@@ -1,9 +1,16 @@
+import 'package:ark/bean/short_property.dart';
 import 'package:ark/routers/router_init.dart';
-import 'package:ark/views/login.dart';
-import 'package:ark/views/mian_project.dart';
-import 'package:ark/views/mine.dart';
-import 'package:ark/views/project_list.dart';
-import 'package:ark/views/splash_page.dart';
+import 'package:ark/ui/concept_object_listview.dart';
+import 'package:ark/ui/login.dart';
+import 'package:ark/ui/mian_project.dart';
+import 'package:ark/ui/mine.dart';
+import 'package:ark/ui/page/concept_detail_view.dart';
+import 'package:ark/ui/page/detail/shortPro_edit_view.dart';
+import 'package:ark/ui/page/object_detail_view.dart';
+import 'package:ark/ui/project_catalog.dart';
+import 'package:ark/ui/project_list.dart';
+import 'package:ark/ui/splash_page.dart';
+
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +23,11 @@ class Routers {
   static String login = "/login";
   static String mine = "/mine";
   static const String main = "/main_project";
-
-  static List<IRouterProvider> _listRouter = [];
+  static const String project_catalog = "/project_catalog";
+  static const String object_list_view = "/object_list_view";
+  static const String concept_detail = "/concept_detail";
+  static const String object_detail = '/object_detail';
+  static const String short_pro_edit = '/short_pro_edit';
 
   static void configureRoutes(Router router) {
     /// 指定路由跳转错误返回页
@@ -51,15 +61,35 @@ class Routers {
         handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       return Login();
     }));
-//
-//    _listRouter.clear();
-//
-//    /// 各自路由由各自模块管理，统一在此添加初始化
-//    _listRouter.add(WalletRouter());
-//
-//    /// 初始化路由
-//    _listRouter.forEach((routerProvider) {
-//      routerProvider.initRouter(router);
-//    });
+
+    router.define(project_catalog, handler: Handler(
+        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      String proName = params['proName'].first;
+      return ProjectCatalog(proName: proName);
+    }));
+
+    router.define(object_list_view, handler: Handler(
+        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      String code = params['code'].first;
+      return ConceptObjectListView(code: code);
+    }));
+
+    router.define(concept_detail, handler: Handler(
+        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      String code = params['code'].first;
+      return ConceptDetailView(code: code);
+    }));
+
+    router.define(object_detail, handler: Handler(
+        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      String objKey = params['obj_key'].first;
+      return ObjectDetailView(objKey: objKey);
+    }));
+
+    router.define(short_pro_edit, handler: Handler(handlerFunc:
+        (BuildContext context, Map<String, List<String>> parameters) {
+      String objKey = parameters['obj_key'].first;
+      return ShortProEditView(objKey: objKey);
+    }));
   }
 }

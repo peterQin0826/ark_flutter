@@ -9,7 +9,8 @@ class MyColors {
   static const Color bg_color = Color(0xFFF8F8F8);
   static const Color dark_bg_color = Color(0xFF18191A);
 
-  static const Color material_bg = Color(0xFFFFFFFF);
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color transparent_white= Color(0xFFFFFFFFFF);
   static const Color dark_material_bg = Color(0xFF303233);
 
   static const Color text = Color(0xFF333333);
@@ -24,7 +25,7 @@ class MyColors {
   static const Color bg_gray = Color(0xFFF6F6F6);
   static const Color dark_bg_gray = Color(0xFF1F1F1F);
 
-  static const Color line = Color(0xFFEEEEEE);
+  static const Color line = Color(0xFFEAEBEF);
   static const Color dark_line = Color(0xFF3A3C3D);
 
   static const Color red = Color(0xFFFF4759);
@@ -79,10 +80,23 @@ class MyColors {
   static const Color color_0DCCCCCC = Color(0xFF0DCCCCCC);
 
   static const Color color_010A29 = Color(0xFF010A29);
-
   static const Color color_DFE6FD = Color(0xFFDFE6FD);
-
-  static const Color color_585D7B=Color(0xFF585D7B);
+  static const Color color_585D7B = Color(0xFF585D7B);
+  static const Color color_black = Color(0xFF000000);
+  static const Color color_040404 = Color(0xFF040404);
+  static const Color color_989CB6 = Color(0xFF989CB6);
+  static const Color color_010101 = Color(0xFF010101);
+  static const Color color_759DFF = Color(0xFF759DFF);
+  static const Color color_D7DADE = Color(0xFFD7DADE);
+  static const Color color_6E757C = Color(0xFF6E757C);
+  static const Color color_page_background = Color(0xFFF4f5f6);
+  static const Color color_697796 = Color(0xFF697796);
+  static const Color color_2E333C = Color(0xFF2E333C);
+  static const Color color_c5c6ca=Color(0xFFC5C6CA);
+  static const Color color_B2B5C0=Color(0xffB2B5C0);
+  static const Color color_F4F5F6=Color(0xffF4F5F6);
+  static const Color color_EAEBEF=Color(0xffEAEBEF);
+  static const Color color_FE3B30=Color(0xffFE3B30);
 
 }
 
