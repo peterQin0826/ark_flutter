@@ -16,7 +16,14 @@ class DetailProModel extends ViewStateModel {
 
   List<PropertyListBean> get propertyList => _propertyList;
 
+  String _key;
+
+  String get key => _key;
+
+
+
   Future<List> getProList(String objKey, String conceptName) async {
+    _key = objKey;
     List<Future> list = List();
     List<Future> proFutureList = List();
     SummaryInfo summaryInfo;
@@ -78,7 +85,6 @@ class DetailProModel extends ViewStateModel {
       }
     }
     await Future.wait(proFutureList);
-    print('=======================>${_propertyList.length}');
     setIdle();
     return _propertyList;
   }
@@ -298,8 +304,79 @@ class DetailProModel extends ViewStateModel {
   deleteListPro(String proName) {
     if (_propertyList.isNotEmpty) {
       for (var pro in _propertyList) {
-        if (Comparable.compare(pro.propertyName, proName) == 0) {
+        if (pro.propertyName != null &&
+            Comparable.compare(pro.propertyName, proName) == 0) {
           _propertyList.remove(pro);
+          notifyListeners();
+          break;
+        }
+      }
+    }
+  }
+
+  /// 删除列表属性的单元格
+  deleteListItem(int id, String proName) {
+    if (_propertyList.isNotEmpty) {
+      for (var property in _propertyList) {
+        if (Comparable.compare(property.propertyName, proName) == 0) {
+          if (property.data != null &&
+              property.data.dt != null &&
+              property.data.dt.length > 0) {
+            for (var dt in property.data.dt) {
+              if (id == dt.id) {
+                property.data.dt.remove(dt);
+                property.total -= 1;
+                notifyListeners();
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// 更新列表属性的条目  或者 添加新条目
+  updateProListItem(Dt dt, String proName, bool isAdd) {
+    print('==============开始更新详情页的数据 ============ ${propertyList.length}');
+
+    for (var property in _propertyList) {
+      print(' 更新详情页的数据  ===> ${property.propertyName}');
+      if (null != property.propertyName &&
+          Comparable.compare(property.propertyName, proName) == 0) {
+        if (isAdd) {
+          property.data.dt.add(dt);
+          notifyListeners();
+          break;
+        } else {
+          if (property.data != null &&
+              property.data.dt != null &&
+              property.data.dt.length > 0) {
+            for (var data in property.data.dt) {
+              if (dt.id == data.id) {
+                data.content = dt.content;
+                data.title = dt.title;
+                data.time = dt.time;
+                data.info = dt.info;
+                data.infos = dt.infos;
+                notifyListeners();
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// 更新别称
+  updateProNa(String pro, String na, int pos) {
+    for (var property in _propertyList) {
+      if (property.propertyName != null &&
+          Comparable.compare(property.propertyName, pro) == 0) {
+        if (property.data != null) {
+          property.data.na = na;
+          property.data.pos = pos;
           notifyListeners();
           break;
         }

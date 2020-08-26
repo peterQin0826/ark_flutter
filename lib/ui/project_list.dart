@@ -68,7 +68,7 @@ class ProjectListPageState extends State<ProjectListPage> {
   @override
   void initState() {
     // TODO: implement initState
-    request();
+    request(context);
     super.initState();
   }
 
@@ -162,8 +162,8 @@ class ProjectListPageState extends State<ProjectListPage> {
     return list;
   }
 
-  void request() {
-    DioUtils.instance.request(HttpMethod.POST, HttpApi.projectList,
+  void request(BuildContext context) {
+    DioUtils.instance.homeRequest(HttpMethod.POST, HttpApi.projectList,context,
         params: {"project_li": ""}, isList: true, successList: (data) {
       List<ProjectModel> mData = List();
       data.forEach((json) {

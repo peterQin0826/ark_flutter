@@ -452,6 +452,8 @@ class BfTableEditViewState extends State<BfTableEditView> {
     calculateController = TextEditingController();
 
     detailProModel = Provider.of<DetailProModel>(context, listen: false);
+
+    print('详情页的数据：${detailProModel.propertyList.length}');
     super.initState();
   }
 

@@ -4,8 +4,11 @@ import 'package:ark/bean/number_key_value_bean.dart';
 import 'package:ark/bean/property_list_bean.dart';
 import 'package:ark/bean/short_property.dart';
 import 'package:ark/common/common.dart';
+import 'package:ark/configs/router_manager.dart';
+import 'package:ark/generated/l10n.dart';
 import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/provider/provider_widget.dart';
+import 'package:ark/provider/view_state_widget.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/ui/page/detail/shortPro_edit_view.dart';
@@ -38,6 +41,8 @@ class DetailPropertyTab extends StatefulWidget {
   DetailPropertyTabState createState() => new DetailPropertyTabState();
 }
 
+DetailProModel model;
+
 class DetailPropertyTabState extends State<DetailPropertyTab>
     with AutomaticKeepAliveClientMixin {
   Divider divider = Divider(
@@ -46,42 +51,40 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
   );
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      child: ProviderWidget<DetailProModel>(
-        model: Provider.of<DetailProModel>(context, listen: false),
-        autoDispose: false,
-        onModelReady: (model) =>
-            model.getProList(widget.objKey, widget.conceptName),
-        builder: (context, model, child) {
-          if (model.isBusy) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return CustomScrollView(
-            shrinkWrap: true,
-            slivers: _ScrollItem(model),
-          );
-        },
-      ),
-    );
-  }
-
-  @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Provider.of<DetailProModel>(context, listen: false)
-          .getProList(widget.objKey, widget.conceptName);
-    });
+    getData();
     super.initState();
   }
 
   @override
-  void dispose() {
-    super.dispose();
+  Widget build(BuildContext context) {
+    DetailProModel model = Provider.of<DetailProModel>(context, listen: false);
+//    model.getProList(widget.objKey, widget.conceptName);
+//    return ProviderWidget<DetailProModel>(
+//      model: Provider.of<DetailProModel>(context, listen: false),
+//      onModelReady: (model) {
+////        model.getProList(widget.objKey, widget.conceptName);
+//      },
+//      builder: (context, model, child) {
+    if (model.isBusy) {
+      return ViewStateBusyWidget();
+    } else if (model.isError) {
+      return ViewStateErrorWidget(error: model.viewStateError);
+    } else if (model.propertyList.length == 0) {
+      return ViewStateEmptyWidget(
+        onPressed: () async {
+          await model.getProList(widget.objKey, widget.conceptName);
+          setState(() {});
+        },
+      );
+    }
+    print('详情页==》${model.propertyList.length}  ${model.key}');
+    return CustomScrollView(
+      shrinkWrap: true,
+      slivers: _ScrollItem(model),
+    );
+//      },
+//    );
   }
 
   List<Widget> _ScrollItem(DetailProModel model) {
@@ -142,7 +145,8 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                 itemCount: property.shortProperties.length,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: EdgeInsets.only(left: 13, right: 15, top: 5,bottom: 5),
+                    padding:
+                        EdgeInsets.only(left: 13, right: 15, top: 5, bottom: 5),
                     child: KeyValue(
                       shortProperty: property.shortProperties[index],
                     ),
@@ -238,7 +242,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                       right: 15,
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
                       child: KeyNumberValue(
                         numberKeyValueBean:
                             property.bfTableBean.bfDatas[position],
@@ -336,9 +340,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) => Column(
-                  children: <Widget>[
-                    _ImageItem(property.data.dt[index], false)
-                  ],
+                  children: <Widget>[_ImageItem(property.data.dt[index])],
                 ),
                 staggeredTileBuilder: (int index) => new StaggeredTile.fit(2),
                 mainAxisSpacing: 10,
@@ -352,7 +354,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
   }
 
   /// 图片list的布局
-  Widget _ImageItem(Dt dt, bool isVideo) {
+  Widget _ImageItem(Dt dt) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
@@ -364,12 +366,10 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
           Container(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: FadeInImage.assetNetwork(
-                placeholder: 'assets/images/img_empty.png',
-                image: isVideo
-                    ? ImageUtils.getImgUrl(dt.content + Constant.videoCover)
-                    : ImageUtils.getImgUrl(dt.content),
+              child: CachedNetworkImage(
+                imageUrl: ImageUtils.getImgUrl(dt.content),
                 fit: BoxFit.cover,
+                placeholder: (context, img) => CircularProgressIndicator(),
               ),
             ),
           ),
@@ -378,24 +378,22 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                dt.title.isNotEmpty
-                    ? Padding(
-                        padding: EdgeInsets.only(top: 5),
-                        child: Text(
-                          dt.title,
-                          style: TextStyle(
-                            color: MyColors.color_040404,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                      )
-                    : Container(
-                        width: 0,
-                        height: 0,
+                Offstage(
+                  offstage: null != dt.title,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text(
+                      dt.title,
+                      style: TextStyle(
+                        color: MyColors.color_040404,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
 
                 Utils.getIndexName(dt.info, 3).isNotEmpty
                     ? Padding(
@@ -416,7 +414,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                 Padding(
                   padding: EdgeInsets.only(top: 5, bottom: 10),
                   child: Text(
-                    dt.time.toString(),
+                    DateUtils.formatDateMsByYMDHM(dt.time),
                     style:
                         TextStyle(color: MyColors.color_989CB6, fontSize: 10),
                   ),
@@ -466,8 +464,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: property.data.dt.length,
                       itemBuilder: (context, position) {
-                        String url = ImageUtils.getImgUrl(
-                            property.data.dt[position].content);
+                        Dt video = property.data.dt[position];
                         return Container(
                           padding: EdgeInsets.only(top: 10),
                           child: Column(
@@ -477,12 +474,14 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                                 children: <Widget>[
                                   ClipRRect(
                                     child: Hero(
-                                      tag: '${url}',
+                                      tag: video,
                                       child: CachedNetworkImage(
                                           width:
                                               MediaQuery.of(context).size.width,
                                           height: 200,
-                                          imageUrl: url + Constant.videoCover,
+                                          imageUrl: ImageUtils.getImgUrl(
+                                              video.content +
+                                                  Constant.videoCover),
                                           fit: BoxFit.cover,
                                           errorWidget: (context, url, error) =>
                                               Image.asset(
@@ -510,7 +509,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
-                                    property.data.dt[position].title.isNotEmpty
+                                    null != property.data.dt[position].title
                                         ? Text(
                                             property.data.dt[position].title,
                                             style: TextStyle(
@@ -667,6 +666,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
                     type: 8,
                     total: property.total,
                     objKey: widget.objKey,
+                    property: property,
                   ),
                   AkaEditWidget(
                     aka: ((null != property.data) ? property.data.na : ""),
@@ -876,6 +876,14 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
 
   @override
   bool get wantKeepAlive => true;
+
+  Future<Widget> getData() async {
+   await Provider.of<DetailProModel>(context, listen: false)
+        .getProList(widget.objKey, widget.conceptName);
+   setState(() {
+
+   });
+  }
 }
 
 class TxtListWidget extends StatelessWidget {
@@ -972,6 +980,7 @@ class TitleRow extends StatelessWidget {
           padding: const EdgeInsets.only(left: 10),
           child: GestureDetector(
             onTap: () {
+              print('点击位置 $type');
               switch (type) {
                 case 0:
                   NavigatorUtils.gotoShortProEdit(context, objKey);
@@ -991,28 +1000,50 @@ class TitleRow extends StatelessWidget {
                         objKey, property.bfTableBean.na, title);
                   }));
                   break;
+                case 3:
+                  Navigator.pushNamed(context, RouteName.text_list_edit_view,
+                      arguments: [objKey, title, property.data.na]);
+                  break;
+                case 4:
+                  Navigator.pushNamed(context, RouteName.img_video_edit,
+                      arguments: [
+                        objKey,
+                        title,
+                        property.data.na,
+                        Constant.image
+                      ]);
+                  break;
+                case 5:
+                  Navigator.pushNamed(context, RouteName.img_video_edit,
+                      arguments: [
+                        objKey,
+                        title,
+                        property.data.na,
+                        Constant.video
+                      ]);
+                  break;
+                case 8:
+                  Navigator.pushNamed(context, RouteName.file_edit_view,
+                      arguments: [objKey, title, property.data.na]);
+                  break;
               }
             },
-            child: Hero(
-              tag: title,
-              child: Row(
-                children: <Widget>[
-                  _showTotal(),
-                  Text(
-                    '编辑',
-                    style:
-                        TextStyle(color: MyColors.color_697796, fontSize: 14),
+            child: Row(
+              children: <Widget>[
+                _showTotal(),
+                Text(
+                  '编辑',
+                  style: TextStyle(color: MyColors.color_697796, fontSize: 14),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Image.asset(
+                    Utils.getImgPath('click_in_grey'),
+                    width: 8,
+                    height: 14,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5),
-                    child: Image.asset(
-                      Utils.getImgPath('click_in_grey'),
-                      width: 8,
-                      height: 14,
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           ),
         ),

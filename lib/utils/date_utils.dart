@@ -15,5 +15,9 @@ class DateUtils{
     return DateUtil.formatDateMs(milliseconds*1000, format: 'yyyy/MM/dd HH:mm');
   }
 
+  static int currentTimeMillis() {
+    return new DateTime.now().millisecondsSinceEpoch~/1000;
+  }
+
 
 }

@@ -2,15 +2,28 @@ import 'dart:convert';
 
 import 'package:ark/bean/bftable_bean.dart';
 import 'package:ark/bean/bmtable_bean.dart';
+import 'package:ark/bean/concept_detail_bean.dart';
 import 'package:ark/bean/object_list_bean.dart';
 import 'package:ark/bean/property_list_bean.dart';
 import 'package:ark/bean/summary_info.dart';
+import 'package:ark/common/sp_constant.dart';
 import 'package:ark/net/dio_utils.dart';
 import 'package:ark/net/http_api.dart';
 import 'package:ark/net/http_method.dart';
+import 'package:flustars/flustars.dart';
 import 'package:flutter/foundation.dart';
 
 class ArkRepository {
+  static Future<ConceptDetailBean> getConceptDetail(String code)  async{
+
+    ConceptDetailBean conceptDetailBean;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.concept_detail,params: {"concept_code":code},isList: false,
+        success: (json){
+          conceptDetailBean=ConceptDetailBean.fromJson(json);
+        });
+    return conceptDetailBean;
+  }
+
   /// 对象列表
   static Future<ObjectListBean> getObjectList(
       String code, int pn, int rn) async {
@@ -98,5 +111,109 @@ class ArkRepository {
     });
 
     return propertyListBean;
+  }
+
+  /// 创建列表属性
+  static Future<bool> createListPro(
+      String objKey, String proName, String na, String ctp, String dt) async {
+    bool isSuccess = false;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.property_add,
+        params: {
+          'obj_key': objKey,
+          'property_name': proName,
+          'na': na,
+          'ctp': ctp,
+          'dt': dt,
+        },
+        isList: false, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
+  }
+
+  /// 修改列表属性
+  static Future<bool> propertyEdit(
+      String objKey, String proName, String na, int pos) async {
+    bool isSuccess = false;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.property_edit,
+        params: {
+          'obj_key': objKey,
+          'property_name': proName,
+          'na': na,
+          'pos': pos
+        },
+        isList: false, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
+  }
+
+  /// 删除列表属性的 单元
+  static Future<bool> deleteItem(
+      String objKey, String proName, String id_li) async {
+    bool isSuccess = false;
+    await DioUtils.instance.request(
+        HttpMethod.POST, HttpApi.property_unit_delete,
+        params: {'obj_key': objKey, 'property_name': proName, 'id_li': id_li},
+        isList: false, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
+  }
+
+  /// 列表属性 修改单元
+  static Future<bool> propertyUnitEdit(
+      String objKey, String proName, String json) async {
+    bool isSuccess;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.property_unit_edit,
+        params: {'obj_key': objKey, 'property_name': proName, 'dt': json},
+        isList: false, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
+  }
+
+  /// 列表属性 添加单元
+  static Future<num> propertyUnitAdd(String objKey, String proName,
+      String content, String title, String info, num time) async {
+    int nid;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.property_unit_add,
+        params: {
+          'obj_key': objKey,
+          'property_name': proName,
+          'content': content,
+          'title': title,
+          'info': info,
+          'time': time
+        },
+        isList: false, success: (json) {
+      nid = json['nid'];
+    });
+    return nid;
+  }
+
+  /// 删除bmtable 属性
+  static Future<bool> deletePro(String objKey, String proName) async {
+    bool isSuccess;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.bmtable_delete,
+        params: {'obj_key': objKey, 'property_name': proName}, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
+  }
+
+  static Future<String> groupId(String type, num size) async {
+    String domain;
+    await DioUtils.instance.request(HttpMethod.GET, HttpApi.group_id,
+        queryParameters: {
+          'group_id': SpUtil.getString(SpConstants.user_key, defValue: ''),
+          'file_type': type,
+          'file_number': 1,
+          'file_size': size
+        },
+        isList: false, success: (json) {
+      domain = json['domain'];
+    });
+    return domain;
   }
 }

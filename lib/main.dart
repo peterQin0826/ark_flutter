@@ -6,8 +6,7 @@ import 'package:ark/common/sp_constant.dart';
 import 'package:ark/base/application.dart';
 import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/provider/appinfo_provider.dart';
-import 'package:ark/provider_setup.dart';
-import 'package:ark/routers/fluro_navigator.dart';
+import 'package:ark/configs/router_manager.dart';
 import 'package:ark/routers/routers.dart';
 import 'package:ark/ui/login.dart';
 import 'package:ark/ui/mian_project.dart';
@@ -18,8 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
-
-import 'bean/theme_bean.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +69,7 @@ class MyApp extends StatelessWidget {
                   primaryColor: _themeColor,
                 ),
                 navigatorKey: NavKey.navKey,
+                onGenerateRoute: MyRouter.generateRoute,
                 home: login ? MainProject() : Login(),
               ),
 

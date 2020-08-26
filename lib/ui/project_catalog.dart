@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ark/bean/catalog_list_bean.dart';
 import 'package:ark/model/catalog_model.dart';
+import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/net/dio_utils.dart';
 import 'package:ark/net/http_api.dart';
 import 'package:ark/net/http_method.dart';
@@ -9,10 +10,12 @@ import 'package:ark/provider/appinfo_provider.dart';
 import 'package:ark/provider_setup.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
+import 'package:ark/configs/router_manager.dart';
 import 'package:ark/utils/theme_utils.dart';
 import 'package:ark/utils/utils.dart';
 import 'package:ark/widgets/app_bar.dart';
 import 'package:ark/widgets/directory_widget_new.dart';
+
 //import 'package:ark/widgets/directory_widget.dart';
 import 'package:ark/widgets/file_widget.dart';
 import 'package:ark/widgets/provider_widget.dart';
@@ -34,6 +37,11 @@ class ProjectCatalog extends StatefulWidget {
 class ProjectCatalogState extends State<ProjectCatalog> {
   @override
   Widget build(BuildContext context) {
+
+    DetailProModel detailProModel =
+    Provider.of<DetailProModel>(context, listen: false);
+    print('验证详情页数据=======================>：${detailProModel.propertyList.length}');
+
     return new Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -50,7 +58,7 @@ class ProjectCatalogState extends State<ProjectCatalog> {
                       width: 10,
                       height: 17,
                     ),
-                    onTap: (){
+                    onTap: () {
                       NavigatorUtils.goBack(context);
                     },
                   ),
@@ -198,8 +206,6 @@ class ProjectCatalogState extends State<ProjectCatalog> {
               startExpanded: true,
               parent: _getDocumentWidget(catalog),
               children: _getChildWidget(catalog.childrenData),
-
-
             ),
           ));
         } else {
@@ -225,15 +231,22 @@ class ProjectCatalogState extends State<ProjectCatalog> {
           ? _getFileWidget(catalogListBean)
           : _getDirectoryWidget(catalogListBean);
 
-  FileWidget _getFileWidget(CatalogListBean catalogListBean) =>
-      FileWidget(concept: catalogListBean,onPressedNext: (){
-        print('文件点击了');
-        NavigatorUtils.gotoObjectListView(context, catalogListBean.code);
-      },);
+  FileWidget _getFileWidget(CatalogListBean catalogListBean) => FileWidget(
+        concept: catalogListBean,
+        onPressedNext: () {
+          print('文件点击了');
+//        NavigatorUtils.gotoObjectListView(context, catalogListBean.code);
+          Navigator.pushNamed(context, RouteName.object_list_view,
+              arguments: [catalogListBean.code]);
+        },
+      );
 
   DirectoryWidget _getDirectoryWidget(CatalogListBean catalogListBean) =>
-      DirectoryWidget(concept: catalogListBean,onPressedNext: (){
-        print('文件夹关闭按钮点击');
-        NavigatorUtils.gotoObjectListView(context, catalogListBean.code);
-      },);
+      DirectoryWidget(
+        concept: catalogListBean,
+        onPressedNext: () {
+          print('文件夹关闭按钮点击');
+          NavigatorUtils.gotoObjectListView(context, catalogListBean.code);
+        },
+      );
 }

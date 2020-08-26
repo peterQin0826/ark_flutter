@@ -25,6 +25,7 @@ class DioUtils {
 
   static DioUtils get instance => DioUtils();
 
+
   factory DioUtils() {
     return _singleton;
   }
@@ -99,6 +100,61 @@ class DioUtils {
               break;
 
             /// 强制登录 todo 有问题
+            case Constant.CODE_995:
+              NavigatorUtils.push(NavKey.navKey.currentContext, Routers.login);
+              break;
+            case Constant.CODE_SUCCESS:
+              if (isList) {
+                successList(responseData['resultObj']);
+              } else {
+                success(responseData['resultObj']);
+              }
+              break;
+            default:
+              Toast.show(message);
+              break;
+          }
+        }
+      } else {
+        error(ErrorEntity(status: -1, message: "未知错误"));
+      }
+    } on DioError catch (e) {
+      error(createErrorEntity(e));
+    }
+  }
+
+
+  Future homeRequest(HttpMethod method, String path,BuildContext context,
+      {dynamic params,
+        Map<String, dynamic> queryParameters,
+        bool isList = false,
+        Function(Map<String, dynamic>) success,
+        Function(List<dynamic>) successList,
+        Function(ErrorEntity) error}) async {
+    try {
+      Response response = await _dio.request(path,
+          data: params,
+          queryParameters: queryParameters,
+          options: Options(method: HttpMethodValues[method]));
+      if (response != null) {
+//        print('查看返回结果：${response.data}');
+        Map<String, dynamic> json = parseData(response.data.toString());
+        int code = json['code'];
+        if (code == 0) {
+          Map<String, dynamic> responseData = json['data'];
+          int status = responseData['status'];
+          String message = responseData['message'];
+          switch (status) {
+
+          /// 软登录
+            case Constant.CODE_999:
+            case Constant.CODE_998:
+            case Constant.CODE_997:
+              Toast.show(message);
+              _onSoftLogin(message,context);
+              break;
+
+          /// 强制登录 todo 有问题
             case Constant.CODE_995:
               NavigatorUtils.push(NavKey.navKey.currentContext, Routers.login);
               break;
@@ -328,27 +384,29 @@ class DioUtils {
     return m;
   }
 
-  Widget _onSoftLogin(String msg) {
+  Widget _onSoftLogin(String msg, BuildContext context) {
     print('软登录 失败回调');
-    return AlertDialog(
-      title: Text("提示"),
-      content: Text(msg),
-      actions: <Widget>[
-        FlatButton(
-          child: Text('取消'),
-          onPressed: () {
-            Navigator.of(NavKey.navKey.currentContext).pop();
-          },
-        ),
-        FlatButton(
-          child: Text('确定'),
-          onPressed: () {
-            NavigatorUtils.push(NavKey.navKey.currentContext, Routers.login);
-            Navigator.of(NavKey.navKey.currentContext).pop(true);
-          },
-        )
-      ],
-    );
+    showDialog(context: context,
+    builder: (context){
+      return AlertDialog(
+        content: Text(msg),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('取消'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: Text('确定'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+              NavigatorUtils.push(context, Routers.login);
+            },
+          )
+        ],
+      );
+    });
   }
 }
 

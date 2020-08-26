@@ -1,3 +1,4 @@
+import 'package:ark/bean/property_list_bean.dart';
 import 'package:ark/bean/short_property.dart';
 import 'package:ark/routers/router_init.dart';
 import 'package:ark/ui/concept_object_listview.dart';
@@ -28,6 +29,7 @@ class Routers {
   static const String concept_detail = "/concept_detail";
   static const String object_detail = '/object_detail';
   static const String short_pro_edit = '/short_pro_edit';
+  static const String text_list_item = 'text_list_item_edit_view';
 
   static void configureRoutes(Router router) {
     /// 指定路由跳转错误返回页
@@ -58,7 +60,7 @@ class Routers {
     }));
 
     router.define(login, handler: Handler(
-        handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+        handlerFunc: (BuildContext context, Map<String, List<Object>> params) {
       return Login();
     }));
 
@@ -91,5 +93,17 @@ class Routers {
       String objKey = parameters['obj_key'].first;
       return ShortProEditView(objKey: objKey);
     }));
+
+//    router.define(text_list_item, handler: Handler(
+//      handlerFunc: (BuildContext context, Map<String, List<String>> parameters){
+//        String objKey = parameters['objKey'].first;
+//        String proName = parameters['proName'].first;
+//        String dtJson=parameters['dt_json'].first;
+//        Dt dt = Dt.fromJson(dtJson);
+//
+//
+//
+//      }
+//    ));
   }
 }

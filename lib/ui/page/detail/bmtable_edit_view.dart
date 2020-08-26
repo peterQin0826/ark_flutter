@@ -34,13 +34,15 @@ class BmTableEditView extends StatefulWidget {
 }
 
 TextEditingController proNameController, naController, posController;
-DetailProModel detailProModel;
+
 
 class BmTableEditViewState extends State<BmTableEditView> {
   TextStyle style = TextStyle(color: MyColors.color_black, fontSize: 16);
 
   @override
   Widget build(BuildContext context) {
+    DetailProModel detailProModel = Provider.of<DetailProModel>(context, listen: false);
+    print('object');
     return ProviderWidget<BmTableModel>(
       model: BmTableModel(objKey: widget.objKey, proName: widget.proName),
       onModelReady: (model) => model.initData(),
@@ -395,7 +397,6 @@ class BmTableEditViewState extends State<BmTableEditView> {
 
     naController = TextEditingController();
     naController.text = widget.na;
-    detailProModel = Provider.of<DetailProModel>(context, listen: false);
     super.initState();
   }
 
@@ -403,6 +404,7 @@ class BmTableEditViewState extends State<BmTableEditView> {
   void dispose() {
     proNameController.dispose();
     naController.dispose();
+    posController.dispose();
     super.dispose();
   }
 }

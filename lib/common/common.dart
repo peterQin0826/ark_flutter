@@ -16,6 +16,7 @@ class Constant {
   static const String phone = 'phone';
   static const String accessToken = 'accessToken';
   static const String refreshToken = 'refreshToken';
+
   //视频封面的后缀
   static final String videoCover = "_1_cover";
 
@@ -30,6 +31,12 @@ class Constant {
   static const int CODE_997 = 997;
 
   static const int CODE_995 = 995;
+
+  static const String text_replace_value = 'text_replace_value';
+  static const String txt_ctp = 'txt';
+  static const String image = 'image';
+  static const String video = 'video';
+  static const String file = 'file';
 }
 
 class AppConfig {

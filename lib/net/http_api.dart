@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class HttpApi {
   static const String login = '/api/v1/xadmin/login/';
   static const String logout = '/api/v1/xadmin/logout/';
@@ -68,10 +70,55 @@ class HttpApi {
 
   ///==========================bftable==============================///
 
-  static const String bftable_Add='/api/v1/xadmin/object/bftable/add';
+  static const String bftable_Add = '/api/v1/xadmin/object/bftable/add';
+
   ///bftable数据删除
-  static const String bftable_remove='/api/v1/xadmin/object/bftable/remove';
+  static const String bftable_remove = '/api/v1/xadmin/object/bftable/remove';
 
-  static const String bftable_delete='/api/v1/xadmin/object/bftable/delete';
+  static const String bftable_delete = '/api/v1/xadmin/object/bftable/delete';
 
+  /// 以下3个未完成
+  static const String bftable_upload = '/api/v1/xadmin/object/bftable/upload';
+
+  static const String bftable_increase =
+      '/api/v1/xadmin/object/bftable/increase';
+
+  static const String bftable_create = '/api/v1/xadmin/object/bftable/create';
+
+  ///==========================列表属性=================================
+  ///
+  /// 列表属性获取
+  static const String propertyPagination =
+      '/api/v1/xadmin/object/property/pagination';
+
+  /// 列表属性添加
+  static const String property_add = '/api/v1/xadmin/object/property/add';
+
+  /// 列表属性修改
+  static const String property_edit = '/api/v1/xadmin/object/property/edit';
+
+  ///一般列表类属性单元删除
+  static const String property_unit_delete =
+      '/api/v1/xadmin/object/property/unit/delete';
+
+  ///一般列表类属性单元添加
+  static const String property_unit_add =
+      '/api/v1/xadmin/object/property/unit/singal_add';
+
+  /// 一般列表类属性修改单元
+  static const String property_unit_edit =
+      '/api/v1/xadmin/object/property/unit/edit';
+
+  ///模糊搜索
+  static const String searchSmart = '/api/v1/xadmin/search/smart_reminder';
+
+  ///搜索结果
+  static const String search_result = '/api/v1/xadmin/search/strict_match/';
+
+  /// 获取动态groupId
+  static const String group_id =
+      'api/v1/xadmin/resource_proxy/generate_group_id/';
+
+  /// 上传资源服务器
+  static const String up_resource='/resource/up_resource/';
 }

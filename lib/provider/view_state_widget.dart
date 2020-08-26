@@ -150,7 +150,7 @@ class ViewStateEmptyWidget extends StatelessWidget {
   const ViewStateEmptyWidget(
       {Key key,
       this.image,
-      this.message,
+      this.message='No Data',
       this.buttonText,
       @required this.onPressed})
       : super(key: key);
@@ -163,7 +163,7 @@ class ViewStateEmptyWidget extends StatelessWidget {
           const Icon(IconFonts.pageEmpty, size: 100, color: Colors.grey),
       title: message ?? S.of(context).viewStateMessageEmpty,
       buttonText: buttonText,
-      buttonTextData: S.of(context).viewStateButtonRefresh,
+      buttonTextData: 'Refresh',
     );
   }
 }

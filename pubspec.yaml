@@ -33,6 +33,8 @@ dependencies:
   # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
   flutter_swiper: ^1.1.6
 
+  path_provider: ^1.6.14
+
   # 启动URL的插件 https://github.com/flutter/plugins/tree/master/packages/url_launcher
   url_launcher: 5.4.1
   # 图片选择插件 https://github.com/flutter/plugins/tree/master/packages/image_picker
@@ -60,7 +62,7 @@ dependencies:
     # 格式化String https://github.com/Naddiseo/dart-sprintf
   sprintf: ^4.0.2
     # 状态管理 https://github.com/rrousselGit/provider
-  provider: ^4.0.4
+  provider: ^4.3.2+1
     # 高德2D地图插件 https://github.com/simplezhli/flutter_2d_amap
     # flutter_2d_amap:
     #   git:
@@ -190,6 +192,9 @@ flutter:
     - assets/images/unknow.png
     - assets/images/bftable_jian.png
     - assets/images/bftable_jia.png
+    - assets/images/img_close.png
+    - assets/images/click_more.png
+    - assets/tp.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

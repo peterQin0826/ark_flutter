@@ -1,5 +1,3 @@
-
-
 import 'package:ark/bean/basic_detail_bean.dart';
 import 'package:ark/model/detail_model.dart';
 import 'package:ark/provider/provider_widget.dart';
@@ -7,6 +5,8 @@ import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/utils/image_utils.dart';
 import 'package:ark/utils/utils.dart';
+import 'package:ark/widgets/ark_skeleton.dart';
+import 'package:ark/widgets/skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,73 +20,77 @@ import 'dart:math' as math;
 class ObjectDetailView extends StatefulWidget {
   final String objKey;
 
-  const ObjectDetailView({Key key, this.objKey}) : super(key: key);
+  const ObjectDetailView({this.objKey});
 
   @override
   ObjectDetailViewState createState() => new ObjectDetailViewState();
 }
 
-class ObjectDetailViewState extends State<ObjectDetailView> with SingleTickerProviderStateMixin{
-
+class ObjectDetailViewState extends State<ObjectDetailView>
+    with SingleTickerProviderStateMixin {
   var tabBar;
+  DetailModel _detailModel;
+
   @override
   void initState() {
-    tabBar=_DetailPageTabBarState();
-    tabList=_getTabList();
+    tabBar = _DetailPageTabBarState();
+    tabList = _getTabList();
     _tabController = TabController(vsync: this, length: tabTxt.length);
 
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
-    return
-      ProviderWidget<DetailModel>(
-        model: DetailModel(objKey: widget.objKey),
-        onModelReady: (model) =>model.getBasicInfo(),
-        builder: (context,model,child){
-          if(model.isBusy){
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          return new Scaffold(
-            appBar:  AppBar(
-
-              leading: GestureDetector(
-                  onTap: (){
-                    NavigatorUtils.goBack(context);
-                  },
-                  child: Icon(Icons.arrow_back_ios,color: MyColors.white,)),
-              title: Text('概念详情',style: TextStyle(color: MyColors.white,fontSize: 18),),
-              actions: <Widget>[
-                IconButton(
-                  icon: Text('新增',style: TextStyle(color: MyColors.white,fontSize: 16),),
-                  onPressed: (){
-                    String objKey=model.basicDetailBean.basicDict.objKey;
-                    print('新增：$objKey');
-                  },
-                )
-              ],
-
-            ),
-            body: Container(
+    return new Scaffold(
+        appBar: AppBar(
+          leading: GestureDetector(
+              onTap: () {
+                NavigatorUtils.goBack(context);
+              },
+              child: Icon(
+                Icons.arrow_back_ios,
+                color: MyColors.white,
+              )),
+          title: Text(
+            '概念详情',
+            style: TextStyle(color: MyColors.white, fontSize: 18),
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Text(
+                '新增',
+                style: TextStyle(color: MyColors.white, fontSize: 16),
+              ),
+              onPressed: () {
+                String objKey = _detailModel.basicDetailBean.basicDict.objKey;
+                print('新增：$objKey');
+              },
+            )
+          ],
+        ),
+        body: ProviderWidget<DetailModel>(
+          model: DetailModel(objKey: widget.objKey),
+          onModelReady: (model) => model.getBasicInfo(),
+          builder: (context, model, child) {
+            _detailModel = model;
+            if (model.isBusy) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Container(
               child: SafeArea(
                 child: DefaultTabController(
                   length: tabTxt.length,
                   child: _getNestScrollView(model),
                 ),
               ),
-            ),
-          );
-        },
-      );
-
+            );
+          },
+        )
+    );
   }
-
-
-
 
   @override
   void dispose() {
@@ -96,15 +100,17 @@ class ObjectDetailViewState extends State<ObjectDetailView> with SingleTickerPro
 
   List<Widget> _getTabList() {
     return tabTxt
-        .map((item) => Text(
-      '$item',
-      style: TextStyle(fontSize: 15),
-    ))
+        .map((item) =>
+        Text(
+          '$item',
+          style: TextStyle(fontSize: 15),
+        ))
         .toList();
   }
+
   _getNestScrollView(DetailModel model) {
     return NestedScrollView(
-      headerSliverBuilder: (BuildContext context,bool innerBoxIsScrolled){
+      headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
         return <Widget>[
           SliverToBoxAdapter(
             child: _basicInfoView(model),
@@ -113,13 +119,12 @@ class ObjectDetailViewState extends State<ObjectDetailView> with SingleTickerPro
             floating: true,
             pinned: true,
             delegate: _SliverAppBarDelegate(
-              maxHeight:50,
-              minHeight: 50,
-              child: Container(
-                color: MyColors.white,
-                child: tabBar,
-              )
-            ),
+                maxHeight: 50,
+                minHeight: 50,
+                child: Container(
+                  color: MyColors.white,
+                  child: tabBar,
+                )),
           )
         ];
       },
@@ -128,7 +133,6 @@ class ObjectDetailViewState extends State<ObjectDetailView> with SingleTickerPro
         objKey: model.basicDetailBean.basicDict.objKey,
         conceptName: model.basicDetailBean.basicDict.conceptName,
       ),
-
     );
   }
 
@@ -140,7 +144,7 @@ class ObjectDetailViewState extends State<ObjectDetailView> with SingleTickerPro
 _basicInfoView(DetailModel model) {
   return Container(
     color: MyColors.white,
-    padding: EdgeInsets.only(top: 23,left: 15,right: 15),
+    padding: EdgeInsets.only(top: 23, left: 15, right: 15),
     child: Flex(
       direction: Axis.horizontal,
       children: <Widget>[
@@ -153,14 +157,12 @@ _basicInfoView(DetailModel model) {
               alignment: Alignment.bottomLeft,
               children: <Widget>[
                 CachedNetworkImage(
-                  imageUrl: ImageUtils.getImgUrl(model.basicDetailBean.basicDict.image),
-                  width: 100,
-                  height: 100,
+                  imageUrl: ImageUtils.getImgUrl(
+                      model.basicDetailBean.basicDict.image),
                   fit: BoxFit.cover,
-                  errorWidget: (context,url,error){
-                    return Image.asset(Utils.getImgPath('img_empty'),
-                    fit: BoxFit.cover,);
-                  },
+                  placeholder: (context, img) => CircularProgressIndicator(),
+                  errorWidget: (context, img, error) =>
+                      Image.asset(Utils.getImgPath('img_empty')),
                 ),
 //                FadeInImage.assetNetwork(
 //                  image: ImageUtils.getImgUrl(model.basicDetailBean.basicDict.image),
@@ -178,7 +180,8 @@ _basicInfoView(DetailModel model) {
                       color: MyColors.color_black,
                       child: Center(
                         child: Text(
-                          model.basicDetailBean.basicDict.objKey,style: TextStyle(color: MyColors.white,fontSize: 10),
+                          model.basicDetailBean.basicDict.objKey,
+                          style: TextStyle(color: MyColors.white, fontSize: 10),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -198,26 +201,46 @@ _basicInfoView(DetailModel model) {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text(model.basicDetailBean.basicDict.objName,style:TextStyle(fontSize: 18,color: MyColors.color_black,fontWeight: FontWeight.bold) ,),
+                    Text(
+                      model.basicDetailBean.basicDict.objName,
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: MyColors.color_black,
+                          fontWeight: FontWeight.bold),
+                    ),
                     Spacer(
                       flex: 1,
                     ),
                     Image(
                       image: ImageUtils.getAssetImage('edit_img'),
-                      width: 18,height: 18,
+                      width: 18,
+                      height: 18,
                     )
                   ],
                 ),
                 Container(
                   child: Padding(
-                    padding:EdgeInsets.only(top: 5) ,
-                    child: Text(model.basicDetailBean.basicDict.aka,style: TextStyle(color: MyColors.color_black,fontSize: 16,),maxLines: 1,overflow: TextOverflow.ellipsis,
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text(
+                      model.basicDetailBean.basicDict.aka,
+                      style: TextStyle(
+                        color: MyColors.color_black,
+                        fontSize: 16,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 5),
-                  child: Text(model.basicDetailBean.basicDict.summary,style: TextStyle(color: MyColors.color_6E757C,fontSize: 14),maxLines: 2,overflow: TextOverflow.ellipsis,),
+                  child: Text(
+                    model.basicDetailBean.basicDict.summary,
+                    style:
+                    TextStyle(color: MyColors.color_6E757C, fontSize: 14),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 )
               ],
             ),
@@ -246,8 +269,8 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => math.max((minHeight ?? kToolbarHeight), minExtent);
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset,
+      bool overlapsContent) {
     return child;
   }
 
@@ -263,10 +286,10 @@ final List<String> tabTxt = [' 属性 ', '关联对象'];
 List<Widget> tabList;
 TabController _tabController;
 
-
 class _DetailPageTabBarState extends StatefulWidget {
   @override
-  _DetailPageTabBarStateState createState() => new _DetailPageTabBarStateState();
+  _DetailPageTabBarStateState createState() =>
+      new _DetailPageTabBarStateState();
 }
 
 class _DetailPageTabBarStateState extends State<_DetailPageTabBarState> {
@@ -305,6 +328,7 @@ class _DetailPageTabBarStateState extends State<_DetailPageTabBarState> {
       ),
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -315,13 +339,8 @@ class _DetailPageTabBarStateState extends State<_DetailPageTabBarState> {
     unselectedStyle = TextStyle(fontSize: 18, color: selectColor);
   }
 
-
-
   @override
   void dispose() {
     super.dispose();
   }
 }
-
-
-
