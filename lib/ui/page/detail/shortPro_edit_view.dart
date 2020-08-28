@@ -36,7 +36,6 @@ class ShortProEditViewState extends State<ShortProEditView> {
     if (propertyList.isNotEmpty && propertyList[0].itemType == 0) {
       shortProperties.addAll(propertyList[0].shortProperties);
     }
-
     super.initState();
   }
 

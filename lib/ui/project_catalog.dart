@@ -37,11 +37,6 @@ class ProjectCatalog extends StatefulWidget {
 class ProjectCatalogState extends State<ProjectCatalog> {
   @override
   Widget build(BuildContext context) {
-
-    DetailProModel detailProModel =
-    Provider.of<DetailProModel>(context, listen: false);
-    print('验证详情页数据=======================>：${detailProModel.propertyList.length}');
-
     return new Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -167,7 +162,6 @@ class ProjectCatalogState extends State<ProjectCatalog> {
                   for (var string in element.children) {
                     for (var catalog in catalogs) {
                       if (string == catalog.conceptName) {
-                        print('object$string');
                         CatalogListBean parent2 = new CatalogListBean();
                         parent2.conceptName = catalog.conceptName;
                         parent2.parent = catalog.parent;

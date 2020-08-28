@@ -1,4 +1,5 @@
 
+
 import 'package:ark/bean/property_list_bean.dart';
 import 'package:ark/model/text_list_model.dart';
 import 'package:ark/ui/concept_object_listview.dart';
@@ -6,8 +7,11 @@ import 'package:ark/ui/page/detail/file_item_edit_view.dart';
 import 'package:ark/ui/page/detail/file_list_edit_view.dart';
 import 'package:ark/ui/page/detail/image_video_edit_view.dart';
 import 'package:ark/ui/page/detail/image_video_item_edit.dart';
+import 'package:ark/ui/page/detail/object_item_edit_view.dart';
+import 'package:ark/ui/page/detail/object_list_edit_view.dart';
 import 'package:ark/ui/page/detail/text_list_edit_view.dart';
 import 'package:ark/ui/page/detail/text_list_item_edit_view.dart';
+import 'package:ark/ui/page/detail/time_list_edit_view.dart';
 import 'package:ark/ui/page/file_upload_view.dart';
 import 'package:ark/ui/page/object_detail_view.dart';
 import 'package:ark/ui/page/search_result_view.dart';
@@ -29,6 +33,9 @@ class RouteName {
   static const String file_edit_view = 'file_edit_view';
   static const String file_item_edit_view = 'file_item_edit_view';
   static const String file_upload = 'file_upload';
+  static const String time_edit='time_edit';
+  static const String object_edit='object_edit';
+  static const String object_item_edit_view='object_item_edit_view';
 }
 
 class MyRouter {
@@ -63,23 +70,22 @@ class MyRouter {
         String objKey = list[0];
         String proName = list[1];
         Dt dt = list[2];
+        String type=list[3];
         return CupertinoPageRoute(
-            builder: (context) => TextListItemEditView(objKey, proName, dt));
+            builder: (context) => TextListItemEditView(objKey, proName, dt,type));
         break;
       case RouteName.smart_Search:
         var list = settings.arguments as List;
-
         if (list != null) {
           String key = list[0];
-          TextListModel textListModel = list[1];
-          String objkey = list[2];
-          String from = list[3];
+          String objkey = list[1];
+          String from = list[2];
           return CupertinoPageRoute(
               builder: (context) =>
-                  SingleSearchView(key, textListModel, objkey, from));
+                  SingleSearchView(key, objkey, from));
         } else {
           return CupertinoPageRoute(
-              builder: (context) => SingleSearchView(null, null, null, null));
+              builder: (context) => SingleSearchView(null,  null, null));
         }
         break;
       case RouteName.checkbox:
@@ -89,12 +95,11 @@ class MyRouter {
         var list = settings.arguments as List;
         String text = list[0];
         String keyName = list[1];
-        TextListModel textListModel = list[2];
-        String objKey = list[3];
-        String from = list[4];
+        String objKey = list[2];
+        String from = list[3];
         return CupertinoPageRoute(
             builder: (context) =>
-                SearchResultView(text, from, textListModel, objKey, keyName));
+                SearchResultView(text, from,  objKey, keyName));
         break;
       case RouteName.img_video_edit:
         var list = settings.arguments as List;
@@ -137,6 +142,34 @@ class MyRouter {
       case RouteName.file_upload:
         return MaterialPageRoute(
             builder: (context) => FileUploadView()
+        );
+        break;
+      case RouteName.time_edit:
+        var list=settings.arguments as List;
+        String objKey =list[0];
+        String proName =list[1];
+        String na=list[2];
+        return CupertinoPageRoute(
+          builder: (context) => TimeListEditView(objKey,proName,na)
+        );
+
+        break;
+      case RouteName.object_edit:
+        var list=settings.arguments as List;
+        String objKey =list[0];
+        String proName =list[1];
+        String na=list[2];
+        return CupertinoPageRoute(
+          builder: (context) =>ObjectListEditView(objKey,proName,na)
+        );
+        break;
+      case RouteName.object_item_edit_view:
+        var list=settings.arguments as List;
+        String objKey=list[0];
+        String proName=list[1];
+        Dt dt=list[2];
+        return CupertinoPageRoute(
+          builder: (context) =>ObjectItemEditView(objKey,proName,dt)
         );
         break;
     }

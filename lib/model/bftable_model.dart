@@ -85,5 +85,8 @@ class BfTableModel extends ViewStateRefreshListModel {
     return isSuccess;
   }
 
+  Future<bool> editBfPro(String na,int pos) async{
+    return await ArkRepository.editBfPro(objKey,  proName, na, pos);
+  }
 
 }

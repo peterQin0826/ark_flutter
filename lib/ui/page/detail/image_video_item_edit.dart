@@ -83,6 +83,9 @@ class ImageVideoItemEditViewState extends State<ImageVideoItemEditView> {
                     .then((value) {
                   if (value) {
                     Toast.show('更新成功');
+                    widget.dt.title=titleController.text;
+                    String before=widget.dt.info.substring(0,widget.dt.info.lastIndexOf('#')+1);
+                    widget.dt.info=before+infoController.text;
                     detailProModel.updateProListItem(
                         widget.dt, widget.proName, false);
                   }
@@ -242,6 +245,7 @@ class ImageVideoItemEditViewState extends State<ImageVideoItemEditView> {
         style: TextStyle(color: MyColors.color_black, fontSize: 16),
         decoration: InputDecoration(border: InputBorder.none),
         keyboardType: TextInputType.multiline,
+        maxLines: 2,
         autofocus: pos == 0 ? true : false,
         enabled: StringUtils.isNotEmpty(widget.proName)
             ? pos == 2 ? false : true

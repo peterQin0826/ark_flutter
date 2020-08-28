@@ -149,7 +149,6 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
               );
             }
             _objectListNewModel=model;
-            print('验证是否刷新');
             return SmartRefresher(
               controller: model.refreshController,
               header: WaterDropHeader(),
@@ -169,137 +168,6 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
           }
       ),
     );
-
-
-
-
-      ProviderWidget<ObjectListNewModel>(
-      model: ObjectListNewModel(code: widget.code, rn: 30),
-      onModelReady: (model) => model.initData(),
-      builder: (context, model, child) {
-        if (model.isBusy) {
-          return SkeletonList(
-            builder: (context, index) => ArkSkeletonItem(),
-          );
-        } else if (model.isError && model.list.isEmpty) {
-          return ViewStateErrorWidget(
-            error: model.viewStateError,
-            onPressed: model.initData(),
-          );
-        } else if (model.isEmpty) {
-          return ViewStateEmptyWidget(
-            onPressed: model.initData(),
-          );
-        }
-
-        print('验证是否刷新');
-        return Scaffold(
-          appBar: new AppBar(
-            automaticallyImplyLeading: false,
-            title: Stack(
-              alignment: Alignment.topLeft,
-              children: <Widget>[
-                Container(
-                  child: Flex(
-                    direction: Axis.horizontal,
-                    children: <Widget>[
-                      GestureDetector(
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          color: MyColors.white,
-                        ),
-                        onTap: () {
-                          NavigatorUtils.goBack(context);
-                        },
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 15),
-                          child: Container(
-                            height: 34,
-                            decoration: BoxDecoration(
-                                color: MyColors.white,
-                                borderRadius: BorderRadius.circular(17)),
-                            child: GestureDetector(
-                              onTap: () {
-                                print('点击了');
-                              },
-                              child: Container(
-                                height: 34,
-                                child: Row(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 15),
-                                      child: Image.asset(
-                                        Utils.getImgPath('main_search'),
-                                        width: 15,
-                                        height: 15,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 5, right: 15),
-                                      child: Text(
-                                        '输入需要搜索的内容',
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            color: MyColors.color_C6CAD7),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10, right: 20),
-                        child: GestureDetector(
-                            onTap: () {
-                              print('进入概念详情页面');
-                              NavigatorUtils.gotoConceptDetail(
-                                  context, model.objectListBean.code);
-                            },
-                            child: Text(
-                              '概念',
-                              style: titleStyle,
-                            )),
-                      ),
-                      GestureDetector(
-                          onTap: () {
-                            print('新建的poppupWindow弹窗');
-                          },
-                          child: Text(
-                            '新建',
-                            style: titleStyle,
-                          ))
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-          body: SmartRefresher(
-            controller: model.refreshController,
-            header: WaterDropHeader(),
-            footer: RefresherFooter(),
-            onRefresh: model.refresh,
-            onLoading: () {
-              model.loadMore(total: model.objectListBean.numPages);
-            },
-            enablePullUp: true,
-            child: ListView.builder(
-                itemCount: model.list.length,
-                itemBuilder: (context, index) {
-                  Data data = model.list[index];
-                  return _item(data);
-                }),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -315,8 +183,6 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
   }
 
   Widget _item(Data data) {
-
-    print('图片地址：${ImageUtils.getImgUrl(data.image)}');
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {

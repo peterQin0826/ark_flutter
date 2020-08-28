@@ -14,11 +14,11 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class SingleSearchView extends StatefulWidget {
   String keyName;
-  TextListModel textListModel;
   String objKey;
   String from;
 
-  SingleSearchView(this.keyName, this.textListModel, this.objKey, this.from);
+  /// todo 构造函数需要改进
+  SingleSearchView(this.keyName, this.objKey, this.from);
 
   @override
   SingleSearchViewState createState() => new SingleSearchViewState();
@@ -85,7 +85,6 @@ class SingleSearchViewState extends State<SingleSearchView> {
                                 context, RouteName.search_result, arguments: [
                               name,
                               widget.keyName,
-                              widget.textListModel,
                               widget.objKey,
                               widget.from
                             ]).then((value) {

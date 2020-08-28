@@ -56,7 +56,7 @@ class FileListEditViewState extends State<FileListEditView>
   @override
   Widget build(BuildContext context) {
     String title = null != widget.proName ? '文件编辑' : '文件列表创建';
-    detailProModel = Provider.of<DetailProModel>(context, listen: true);
+    detailProModel = Provider.of<DetailProModel>(context, listen: false);
     print('文件列表：${detailProModel.key}');
     return new Scaffold(
       appBar: new AppBar(
@@ -80,7 +80,7 @@ class FileListEditViewState extends State<FileListEditView>
                     .then((value) {
                   if (value) {
                     Toast.show('属性更新成功');
-                    detailProModel.updateProNa(
+                    detailProModel.updateListProNa(
                         widget.proName,
                         naController.text,
                         StringUtils.isNotEmpty(posController.text)

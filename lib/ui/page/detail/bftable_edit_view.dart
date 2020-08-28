@@ -8,6 +8,7 @@ import 'package:ark/provider/view_state_widget.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/ui/helper/refresh_helper.dart';
+import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
 import 'package:ark/utils/utils.dart';
 import 'package:ark/widgets/ark_skeleton.dart';
@@ -42,50 +43,68 @@ TextEditingController proNameController,
 DetailProModel detailProModel;
 
 class BfTableEditViewState extends State<BfTableEditView> {
+  BfTableModel currentModel;
+
   @override
   Widget build(BuildContext context) {
     TextStyle style = TextStyle(color: MyColors.color_black, fontSize: 16);
-
-    return ProviderWidget<BfTableModel>(
-      model: BfTableModel(widget.objKey, widget.proName),
-      onModelReady: (model) => model.initData(),
-      builder: (context, model, child) {
-        if (model.isBusy) {
-          return SkeletonList(
-            builder: (context, index) => ArkSkeletonItem(),
-          );
-        } else if (model.isError && model.list.isEmpty) {
-          return ViewStateErrorWidget(
-            error: model.viewStateError,
-            onPressed: model.initData(),
-          );
-        } else if (model.isEmpty) {
-          return ViewStateEmptyWidget(
-            onPressed: model.initData(),
-          );
-        }
-        return Scaffold(
-          appBar: new AppBar(
-            centerTitle: true,
-            title: new Text(
-                widget.proName.isNotEmpty ? 'BfTable编辑页' : 'BfTable新建页'),
-            actions: <Widget>[
-              IconButton(
-                icon: Text(
-                  '确定',
-                  style: TextStyle(color: MyColors.white, fontSize: 16),
-                ),
-                onPressed: () {
-                  if (widget.proName.isNotEmpty) {
-                    print('编辑');
-                  } else {
-                    print('新建');
+    return Scaffold(
+      appBar: new AppBar(
+        centerTitle: true,
+        title:
+            new Text(widget.proName.isNotEmpty ? 'BfTable编辑页' : 'BfTable新建页'),
+        actions: <Widget>[
+          IconButton(
+            icon: Text(
+              '确定',
+              style: TextStyle(color: MyColors.white, fontSize: 16),
+            ),
+            onPressed: () {
+              if (widget.proName.isNotEmpty) {
+                currentModel
+                    .editBfPro(
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
+                            ? int.parse(posController.text)
+                            : -1)
+                    .then((value) {
+                  if (value) {
+                    Toast.show('属性编辑成功');
+                    detailProModel.updateListProNa(
+                        widget.proName,
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
+                            ? int.parse(posController.text)
+                            : -1,isBf: true);
                   }
-                },
-              )
-            ],
-          ),
-          body: Flex(
+                });
+              } else {
+                print('新建');
+              }
+            },
+          )
+        ],
+      ),
+      body: ProviderWidget<BfTableModel>(
+        model: BfTableModel(widget.objKey, widget.proName),
+        onModelReady: (model) => model.initData(),
+        builder: (context, model, child) {
+          if (model.isBusy) {
+            return SkeletonList(
+              builder: (context, index) => ArkSkeletonItem(),
+            );
+          } else if (model.isError && model.list.isEmpty) {
+            return ViewStateErrorWidget(
+              error: model.viewStateError,
+              onPressed: model.initData(),
+            );
+          } else if (model.isEmpty) {
+            return ViewStateEmptyWidget(
+              onPressed: model.initData(),
+            );
+          }
+          currentModel = model;
+          return Flex(
             direction: Axis.vertical,
             children: <Widget>[
               Container(
@@ -298,144 +317,143 @@ class BfTableEditViewState extends State<BfTableEditView> {
                 ),
               )
             ],
-          ),
-          bottomNavigationBar: BottomAppBar(
-            elevation: 0,
-            child: Container(
-              height: 60,
-              padding: EdgeInsets.all(10),
-              child: Flex(
-                direction: Axis.horizontal,
-                children: <Widget>[
-                  widget.proName.isNotEmpty
-                      ? GestureDetector(
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return DetailTemplate(type: 'bf');
-                            }));
-                          },
-                          child: Image.asset(
-                            Utils.getImgPath('unknow'),
-                            width: 30,
-                            height: 30,
-                          ),
-                        )
-                      : Container(
-                          width: 0,
-                          height: 0,
-                        ),
-                  widget.proName.isNotEmpty
-                      ? Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 15),
-                            child: Container(
-                              height: 38,
-                              decoration: BoxDecoration(
-                                  color: MyColors.white,
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                      color: MyColors.color_1246FF, width: 1)),
-                              child: Center(
-                                child: Text(
-                                  '上传文件',
-                                  style: TextStyle(
-                                      color: MyColors.color_1246FF,
-                                      fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          width: 0,
-                          height: 0,
-                        ),
-                  Expanded(
-                    flex: 1,
-                    child: GestureDetector(
+          );
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        child: Container(
+          height: 60,
+          padding: EdgeInsets.all(10),
+          child: Flex(
+            direction: Axis.horizontal,
+            children: <Widget>[
+              widget.proName.isNotEmpty
+                  ? GestureDetector(
                       onTap: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                content: Text('确定删除当前属性？'),
-                                actions: <Widget>[
-                                  FlatButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('取消'),
-                                  ),
-                                  FlatButton(
-                                    child: Text('确定'),
-                                    onPressed: () {
-                                      model.deletePro().then((value) {
-                                        if (true) {
-                                          Toast.show('属性删除成功');
-                                          Navigator.of(context).pop(true);
-                                          NavigatorUtils.goBack(context);
-                                        }
-                                      });
-                                    },
-                                  )
-                                ],
-                              );
-                            });
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return DetailTemplate(type: 'bf');
+                        }));
                       },
+                      child: Image.asset(
+                        Utils.getImgPath('unknow'),
+                        width: 30,
+                        height: 30,
+                      ),
+                    )
+                  : Container(
+                      width: 0,
+                      height: 0,
+                    ),
+              widget.proName.isNotEmpty
+                  ? Expanded(
+                      flex: 1,
                       child: Padding(
                         padding: EdgeInsets.only(left: 15),
                         child: Container(
                           height: 38,
                           decoration: BoxDecoration(
-                            color: MyColors.white,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                                color: MyColors.color_1246FF, width: 1),
-                          ),
+                              color: MyColors.white,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                  color: MyColors.color_1246FF, width: 1)),
                           child: Center(
                             child: Text(
-                              '删除',
+                              '上传文件',
                               style: TextStyle(
-                                  color: MyColors.color_1246FF, fontSize: 18),
+                                  color: MyColors.color_1246FF, fontSize: 16),
                             ),
                           ),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      width: 0,
+                      height: 0,
+                    ),
+              Expanded(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: Text('确定删除当前属性？'),
+                            actions: <Widget>[
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('取消'),
+                              ),
+                              FlatButton(
+                                child: Text('确定'),
+                                onPressed: () {
+                                  currentModel.deletePro().then((value) {
+                                    if (true) {
+                                      Toast.show('属性删除成功');
+                                      Navigator.of(context).pop(true);
+                                      NavigatorUtils.goBack(context);
+                                    }
+                                  });
+                                },
+                              )
+                            ],
+                          );
+                        });
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 15),
+                    child: Container(
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: MyColors.white,
+                        borderRadius: BorderRadius.circular(4),
+                        border:
+                            Border.all(color: MyColors.color_1246FF, width: 1),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '删除',
+                          style: TextStyle(
+                              color: MyColors.color_1246FF, fontSize: 18),
                         ),
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          model.list.add(NumberKeyValueBean(key: '', value: 0));
-                          setState(() {});
-                        },
-                        child: Container(
-                          height: 38,
-                          decoration: BoxDecoration(
-                              color: MyColors.color_1246FF,
-                              borderRadius: BorderRadius.circular(4)),
-                          child: Center(
-                            child: Text(
-                              '添加',
-                              style: TextStyle(
-                                  color: MyColors.white, fontSize: 18),
-                            ),
-                          ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 15),
+                  child: GestureDetector(
+                    onTap: () {
+                      currentModel.list
+                          .add(NumberKeyValueBean(key: '', value: 0));
+                      setState(() {});
+                    },
+                    child: Container(
+                      height: 38,
+                      decoration: BoxDecoration(
+                          color: MyColors.color_1246FF,
+                          borderRadius: BorderRadius.circular(4)),
+                      child: Center(
+                        child: Text(
+                          '添加',
+                          style: TextStyle(color: MyColors.white, fontSize: 18),
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
-            ),
+                  ),
+                ),
+              )
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -452,8 +470,6 @@ class BfTableEditViewState extends State<BfTableEditView> {
     calculateController = TextEditingController();
 
     detailProModel = Provider.of<DetailProModel>(context, listen: false);
-
-    print('详情页的数据：${detailProModel.propertyList.length}');
     super.initState();
   }
 

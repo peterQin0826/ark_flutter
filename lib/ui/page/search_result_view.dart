@@ -33,12 +33,11 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 class SearchResultView extends StatefulWidget {
   String _text;
   String keyName;
-  TextListModel textListModel;
+
   String objKey;
   String from;
 
-  SearchResultView(
-      this._text, this.from, this.textListModel, this.objKey, this.keyName);
+  SearchResultView(this._text, this.from, this.objKey, this.keyName);
 
   @override
   SearchResultViewState createState() => new SearchResultViewState();
@@ -50,6 +49,19 @@ class SearchResultViewState extends State<SearchResultView> {
 
   @override
   Widget build(BuildContext context) {
+    String popPage;
+    Event _event;
+    if (widget.from == Constant.text_replace_value) {
+      popPage = RouteName.text_list_item_edit_view;
+      _event = Event.search_key;
+    } else if (widget.from == Constant.object_replace_object) {
+      popPage = RouteName.object_item_edit_view;
+      _event = Event.replace_object;
+    } else if (widget.from == Constant.object_replace_value) {
+      popPage = RouteName.object_item_edit_view;
+      _event = Event.search_key;
+    }
+
     return ProviderWidget<SearchResultModel>(
       model: new SearchResultModel(widget._text),
       onModelReady: (model) {
@@ -99,14 +111,12 @@ class SearchResultViewState extends State<SearchResultView> {
                               child: Text('确定'),
                               onPressed: () {
                                 Navigator.of(context).pop('好的');
-                                EventObj eventObj=EventObj(Event.search_key, _data);
-                                eventBus
-                                    .fire(eventObj);
-                                print('eventbus 发送数据:${json.encode(eventObj.data)}');
+                                EventObj eventObj = EventObj(_event, _data);
+                                eventBus.fire(eventObj);
+                                print(
+                                    'eventbus 发送数据:${json.encode(eventObj.data)}');
                                 Navigator.popUntil(
-                                    context,
-                                    ModalRoute.withName(
-                                        RouteName.text_list_item_edit_view));
+                                    context, ModalRoute.withName(popPage));
                               },
                             )
                           ],

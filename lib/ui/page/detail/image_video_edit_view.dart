@@ -21,6 +21,7 @@ import 'package:ark/ui/helper/refresh_helper.dart';
 import 'package:ark/utils/date_utils.dart';
 import 'package:ark/utils/file_utils.dart';
 import 'package:ark/utils/image_utils.dart';
+import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
 import 'package:ark/utils/utils.dart';
 import 'package:ark/widgets/ark_skeleton.dart';
@@ -100,10 +101,21 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                 print('编辑，不分类型');
                 _currentModel
                     .propertyEdit(
-                        naController.text, num.parse(posController.text))
+                  naController.text,
+                  StringUtils.isNotEmpty(posController.text)
+                      ? int.parse(posController.text)
+                      : -1,
+                )
                     .then((value) {
                   if (value) {
                     Toast.show('属性更新成功');
+
+                    detailProModel.updateListProNa(
+                        widget.proName,
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
+                            ? int.parse(posController.text)
+                            : -1);
                   }
                 });
               } else {
@@ -219,7 +231,8 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                               imgContent.content + Constant.videoCover);
                         }
                         print('图片地址==> $imgUrl');
-                        return ImageVideoItem(widget.objKey,widget.proName,widget.type,imgContent,index);
+                        return ImageVideoItem(widget.objKey, widget.proName,
+                            widget.type, imgContent, index);
                       }),
                 ),
               )

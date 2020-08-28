@@ -33,10 +33,14 @@ class Constant {
   static const int CODE_995 = 995;
 
   static const String text_replace_value = 'text_replace_value';
+  static const String object_replace_value = 'object_replace_value';
+  static const String object_replace_object = 'object_replace_object';
+
   static const String txt_ctp = 'txt';
   static const String image = 'image';
   static const String video = 'video';
   static const String file = 'file';
+  static const String empty_view = 'img_empty';
 }
 
 class AppConfig {

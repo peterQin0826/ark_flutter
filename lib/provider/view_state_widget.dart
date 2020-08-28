@@ -3,7 +3,6 @@ import 'package:ark/res/resource_mananger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 import 'view_state.dart';
 
 /// 加载中
@@ -102,7 +101,7 @@ class ViewStateErrorWidget extends StatelessWidget {
     var defaultImage;
     var defaultTitle;
     var errorMessage = error.message;
-    String defaultTextData = S.of(context).viewStateButtonRetry;
+    String defaultTextData = ' Retry !';
     switch (error.errorType) {
       case ViewStateErrorType.networkTimeOutError:
         defaultImage = Transform.translate(
@@ -110,13 +109,13 @@ class ViewStateErrorWidget extends StatelessWidget {
           child: const Icon(IconFonts.pageNetworkError,
               size: 100, color: Colors.grey),
         );
-        defaultTitle = S.of(context).viewStateMessageNetworkError;
+        defaultTitle = 'Load Failed,Check network !';
         // errorMessage = ''; // 网络异常移除message提示
         break;
       case ViewStateErrorType.defaultError:
         defaultImage =
             const Icon(IconFonts.pageError, size: 100, color: Colors.grey);
-        defaultTitle = S.of(context).viewStateMessageError;
+        defaultTitle = 'Load Failed !';
         break;
 
       case ViewStateErrorType.unauthorizedError:
@@ -139,7 +138,6 @@ class ViewStateErrorWidget extends StatelessWidget {
   }
 }
 
-
 /// 页面无数据
 class ViewStateEmptyWidget extends StatelessWidget {
   final String message;
@@ -150,7 +148,7 @@ class ViewStateEmptyWidget extends StatelessWidget {
   const ViewStateEmptyWidget(
       {Key key,
       this.image,
-      this.message='No Data',
+      this.message = 'No Data',
       this.buttonText,
       @required this.onPressed})
       : super(key: key);
@@ -168,7 +166,6 @@ class ViewStateEmptyWidget extends StatelessWidget {
   }
 }
 
-
 /// 页面未授权
 class ViewStateUnAuthWidget extends StatelessWidget {
   final String message;
@@ -178,10 +175,10 @@ class ViewStateUnAuthWidget extends StatelessWidget {
 
   const ViewStateUnAuthWidget(
       {Key key,
-        this.image,
-        this.message,
-        this.buttonText,
-        @required this.onPressed})
+      this.image,
+      this.message,
+      this.buttonText,
+      @required this.onPressed})
       : super(key: key);
 
   @override

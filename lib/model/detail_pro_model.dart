@@ -20,8 +20,6 @@ class DetailProModel extends ViewStateModel {
 
   String get key => _key;
 
-
-
   Future<List> getProList(String objKey, String conceptName) async {
     _key = objKey;
     List<Future> list = List();
@@ -359,6 +357,7 @@ class DetailProModel extends ViewStateModel {
                 data.time = dt.time;
                 data.info = dt.info;
                 data.infos = dt.infos;
+                data.expandedDataBean = dt.expandedDataBean;
                 notifyListeners();
                 break;
               }
@@ -370,15 +369,28 @@ class DetailProModel extends ViewStateModel {
   }
 
   /// 更新别称
-  updateProNa(String pro, String na, int pos) {
+  updateListProNa(String pro, String na, int pos,
+      {bool isBf = false, bool isBm = false}) {
     for (var property in _propertyList) {
-      if (property.propertyName != null &&
-          Comparable.compare(property.propertyName, pro) == 0) {
+      print('开始更新别称：${property.propertyName}');
+      if (property.propertyName != null && property.propertyName == pro) {
         if (property.data != null) {
           property.data.na = na;
           property.data.pos = pos;
           notifyListeners();
           break;
+        }
+      }
+      if (isBf && property.bfTableBean != null) {
+        if (property.bfTableBean.propertyName == pro) {
+          property.bfTableBean.na = na;
+          property.data.pos = pos;
+        }
+      }
+      if (isBm && property.bmTableBean != null) {
+        if (property.bmTableBean.propertyName == pro) {
+          property.bmTableBean.na = na;
+          property.data.pos = pos;
         }
       }
     }

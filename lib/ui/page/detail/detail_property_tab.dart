@@ -16,7 +16,16 @@ import 'package:ark/ui/page/test_video.dart';
 import 'package:ark/utils/date_utils.dart';
 import 'package:ark/utils/image_utils.dart';
 import 'package:ark/utils/utils.dart';
+import 'package:ark/widgets/detail/detail_tab/bftable_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/bmtable_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/file_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/image_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/object_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/time_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/txt_pro_tab.dart';
+import 'package:ark/widgets/detail/detail_tab/video_pro_tab.dart';
 import 'package:ark/widgets/detail/horizontal_chart.dart';
+import 'package:ark/widgets/detail/detail_tab/short_pro_tab.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:common_utils/common_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -59,13 +68,6 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
   @override
   Widget build(BuildContext context) {
     DetailProModel model = Provider.of<DetailProModel>(context, listen: false);
-//    model.getProList(widget.objKey, widget.conceptName);
-//    return ProviderWidget<DetailProModel>(
-//      model: Provider.of<DetailProModel>(context, listen: false),
-//      onModelReady: (model) {
-////        model.getProList(widget.objKey, widget.conceptName);
-//      },
-//      builder: (context, model, child) {
     if (model.isBusy) {
       return ViewStateBusyWidget();
     } else if (model.isError) {
@@ -78,13 +80,10 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
         },
       );
     }
-    print('详情页==》${model.propertyList.length}  ${model.key}');
     return CustomScrollView(
       shrinkWrap: true,
       slivers: _ScrollItem(model),
     );
-//      },
-//    );
   }
 
   List<Widget> _ScrollItem(DetailProModel model) {
@@ -93,31 +92,31 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
       for (var property in model.propertyList) {
         switch (property.itemType) {
           case 0:
-            list.add(_ShortProItem(property));
+            list.add(ShortProTab(property,widget.objKey));
             break;
           case 1:
-            list.add(_BmTableProItem(property));
+            list.add(BmTableProTab(property,widget.objKey));
             break;
           case 2:
-            list.add(_BfTableProItem(property));
+            list.add(BfTableProTab(property,widget.objKey));
             break;
           case 3:
-            list.add(_TxtProItem(property));
+            list.add(TxtProTab(property,widget.objKey));
             break;
           case 4:
-            list.add(_ImageProItem(property));
+            list.add(ImageProTab(property,widget.objKey));
             break;
           case 5:
-            list.add(_VideoProItem(property));
+            list.add(VideoProTab(property,widget.objKey));
             break;
           case 6:
-            list.add(_ObjectProItem(property));
+            list.add(ObjectProTab(property,widget.objKey));
             break;
           case 7:
-            list.add(_TimeProItem(property));
+            list.add(TimeProTab(property,widget.objKey));
             break;
           case 8:
-            list.add(_FileProItem(property));
+            list.add(FileProTab(property,widget.objKey));
             break;
         }
       }
@@ -379,7 +378,7 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Offstage(
-                  offstage: null != dt.title,
+                  offstage: dt.title==null,
                   child: Padding(
                     padding: EdgeInsets.only(top: 5),
                     child: Text(
@@ -878,11 +877,9 @@ class DetailPropertyTabState extends State<DetailPropertyTab>
   bool get wantKeepAlive => true;
 
   Future<Widget> getData() async {
-   await Provider.of<DetailProModel>(context, listen: false)
+    await Provider.of<DetailProModel>(context, listen: false)
         .getProList(widget.objKey, widget.conceptName);
-   setState(() {
-
-   });
+    setState(() {});
   }
 }
 
@@ -893,7 +890,6 @@ class TxtListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(' time --> ${dt.time}');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1021,6 +1017,14 @@ class TitleRow extends StatelessWidget {
                         property.data.na,
                         Constant.video
                       ]);
+                  break;
+                case 6:
+                  Navigator.pushNamed(context, RouteName.object_edit,
+                      arguments: [objKey, title, property.data.na]);
+                  break;
+                case 7:
+                  Navigator.pushNamed(context, RouteName.time_edit,
+                      arguments: [objKey, title, property.data.na]);
                   break;
                 case 8:
                   Navigator.pushNamed(context, RouteName.file_edit_view,

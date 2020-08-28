@@ -6,6 +6,7 @@ import 'package:ark/net/http_method.dart';
 import 'package:ark/provider/view_state_list_model.dart';
 import 'package:ark/provider/view_state_model.dart';
 import 'package:ark/provider/view_state_refresh_list_model.dart';
+import 'package:ark/service/ark_repository.dart';
 
 class BmTableModel extends ViewStateRefreshListModel {
   BmTableBean _bmTableBean;
@@ -88,5 +89,10 @@ class BmTableModel extends ViewStateRefreshListModel {
     var result = await Future.wait(futures);
     _bmTableBean = result[0];
     return _bmDatas;
+  }
+
+  /// 编辑属性
+  Future<bool> bmTableEditPro(String na, int pos) async {
+    return await ArkRepository.bmTableEditPro(objKey, proName, na, pos);
   }
 }

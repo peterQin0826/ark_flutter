@@ -85,6 +85,8 @@ class HttpApi {
 
   static const String bftable_create = '/api/v1/xadmin/object/bftable/create';
 
+  static const String bftable_edit_pro='/api/v1/xadmin/object/bftable/edit';
+
   ///==========================列表属性=================================
   ///
   /// 列表属性获取

@@ -99,10 +99,12 @@ class MyColors {
   static const Color color_FE3B30 = Color(0xffFE3B30);
   static const Color color_7b7878 = Color(0xff7B7878);
   static const Color color_F0F3FE = Color(0xffF0F3FE);
-  static const Color color_E4E5E6= Color(0xffE4E5E6);
-  static const Color color_ABAFB2=Color(0xffABAFB2);
-
-
+  static const Color color_E4E5E6 = Color(0xffE4E5E6);
+  static const Color color_ABAFB2 = Color(0xffABAFB2);
+  static const Color color_c5c6c8 = Color(0xffC5C6C8);
+  static const Color color_8F9091 = Color(0xff8F9091);
+  static const Color color_AEAEAE=Color(0xffAEAEAE);
+  static const Color color_F1F2F6=Color(0xffF1F2F6);
 }
 
 Map<String, Color> circleAvatarMap = {

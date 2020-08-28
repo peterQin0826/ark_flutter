@@ -14,13 +14,12 @@ import 'package:flustars/flustars.dart';
 import 'package:flutter/foundation.dart';
 
 class ArkRepository {
-  static Future<ConceptDetailBean> getConceptDetail(String code)  async{
-
+  static Future<ConceptDetailBean> getConceptDetail(String code) async {
     ConceptDetailBean conceptDetailBean;
-    await DioUtils.instance.request(HttpMethod.POST, HttpApi.concept_detail,params: {"concept_code":code},isList: false,
-        success: (json){
-          conceptDetailBean=ConceptDetailBean.fromJson(json);
-        });
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.concept_detail,
+        params: {"concept_code": code}, isList: false, success: (json) {
+      conceptDetailBean = ConceptDetailBean.fromJson(json);
+    });
     return conceptDetailBean;
   }
 
@@ -79,6 +78,22 @@ class ArkRepository {
       propertyListBean.data = propertyListData;
     });
     return propertyListBean;
+  }
+
+  static Future<bool> editBfPro(
+      String objkey, String proName, String na, int pos) async {
+    bool isSuccess;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.bftable_edit_pro,
+        isList: false,
+        params: {
+          'obj_key': objkey,
+          'property_name': proName,
+          'na': na,
+          'pos': pos
+        }, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
   }
 
   /// 获取详情页的摘要信息
@@ -215,5 +230,21 @@ class ArkRepository {
       domain = json['domain'];
     });
     return domain;
+  }
+
+  static Future<bool> bmTableEditPro(
+      String objKey, String proName, String na, int pos) async {
+    bool isSuccess;
+    await DioUtils.instance.request(HttpMethod.POST, HttpApi.bmtable_pro_edit,
+        isList: false,
+        params: {
+          'obj_key': objKey,
+          'property_name': proName,
+          'na': na,
+          'pos': pos
+        }, success: (json) {
+      isSuccess = true;
+    });
+    return isSuccess;
   }
 }
