@@ -83,12 +83,18 @@ class DioUtils {
           options: Options(method: HttpMethodValues[method]));
       if (response != null) {
 //        print('查看返回结果：${response.data}');
-        Map<String, dynamic> json = parseData(response.data.toString());
-        int code = json['code'];
+        Map<String, dynamic> jsonString = parseData(response.data.toString());
+        int code = jsonString['code'];
         if (code == 0) {
-          Map<String, dynamic> responseData = json['data'];
+          Map<String, dynamic> responseData = jsonString['data'];
           int status = responseData['status'];
-          String message = responseData['message'];
+          String message;
+          try{
+            message= responseData['message'];
+          }catch (e){
+            message= json.encode(responseData['message']);
+          }
+
           switch (status) {
 
             /// 软登录
@@ -174,7 +180,8 @@ class DioUtils {
         error(ErrorEntity(status: -1, message: "未知错误"));
       }
     } on DioError catch (e) {
-      error(createErrorEntity(e));
+//      error(createErrorEntity(e));
+      Toast.show(createErrorEntity(e).message);
     }
   }
 

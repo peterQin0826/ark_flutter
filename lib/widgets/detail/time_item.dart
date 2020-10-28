@@ -32,20 +32,15 @@ class TimeItemState extends State<TimeItem> {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: (){
+      onTap: () {
         /// 可以删除栈中的多个路由
         Navigator.push(
             context,
             CupertinoPageRoute(
-                settings: RouteSettings(
-                    name: RouteName
-                        .text_list_item_edit_view),
-                builder: (context) =>
-                    TextListItemEditView(
-                        widget.objKey,
-                        widget.proName,
-                        widget.time,
-                        Constant.file))).then((value) {
+                settings:
+                    RouteSettings(name: RouteName.text_list_item_edit_view),
+                builder: (context) => TextListItemEditView(widget.objKey,
+                    widget.proName, widget.time, Constant.time))).then((value) {
           if (value != null) {
             Dt data = value;
             widget.time.title = data.title;
@@ -109,8 +104,9 @@ class TimeItemState extends State<TimeItem> {
                     itemBuilder: (context, index) {
                       return InfoItem(widget.time.infos[index]);
                     },
-                    itemCount:
-                        widget.time.infos != null ? widget.time.infos.length : 0,
+                    itemCount: widget.time.infos != null
+                        ? widget.time.infos.length
+                        : 0,
                   )
                 ],
               ),

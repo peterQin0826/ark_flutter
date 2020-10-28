@@ -7,6 +7,7 @@ import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/provider/provider_widget.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
+import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -66,26 +67,37 @@ class BmTableItemEditState extends State<BmTableItemEdit> {
                     }
                     Map<String, String> map = new Map();
                     map[keyController.text] = valueController.text;
-                    model.editItem(json.encode(map)).then((value) {
-                      if (value) {
-                        if (widget.short.key.isNotEmpty) {
-                          Toast.show('更新成功');
-                          detailProModel.updateBmtableItem(widget.proName,
-                              keyController.text, valueController.text, false);
-                        } else {
-                          Toast.show('添加成功');
-                          detailProModel.updateBmtableItem(widget.proName,
-                              keyController.text, valueController.text, true);
-                        }
 
-                        ShortProperty short = new ShortProperty();
-                        short.key = keyController.text;
-                        short.value = valueController.text;
-                        NavigatorUtils.goBackWithParams(context, short);
-                      } else {
-                        Toast.show('更新失败');
-                      }
-                    });
+                    if (StringUtils.isNotEmpty(widget.proName)) {
+                      model.editItem(json.encode(map)).then((value) {
+                        if (value) {
+                          if (widget.short.key.isNotEmpty) {
+                            Toast.show('更新成功');
+                            detailProModel.updateBmtableItem(
+                                widget.proName,
+                                keyController.text,
+                                valueController.text,
+                                false);
+                          } else {
+                            Toast.show('添加成功');
+                            detailProModel.updateBmtableItem(widget.proName,
+                                keyController.text, valueController.text, true);
+                          }
+
+                          ShortProperty short = new ShortProperty();
+                          short.key = keyController.text;
+                          short.value = valueController.text;
+                          NavigatorUtils.goBackWithParams(context, short);
+                        } else {
+                          Toast.show('更新失败');
+                        }
+                      });
+                    } else {
+                      ShortProperty short = new ShortProperty();
+                      short.key = keyController.text;
+                      short.value = valueController.text;
+                      NavigatorUtils.goBackWithParams(context, short);
+                    }
                   }
                 },
               )
@@ -116,9 +128,7 @@ class BmTableItemEditState extends State<BmTableItemEdit> {
                             decoration: InputDecoration(
                                 labelStyle: valueStyle,
                                 enabled:
-                                        widget.short.key.isNotEmpty
-                                    ? false
-                                    : true),
+                                    widget.short.key.isNotEmpty ? false : true),
                           ),
                         ),
                       )

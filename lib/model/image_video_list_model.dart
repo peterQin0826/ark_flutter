@@ -65,10 +65,7 @@ class CommonProListModel extends ViewStateRefreshListModel {
   /// 创建属性
   Future<bool> createListPro(
       String proName, String na, String ctp, String dt) async {
-    List<Future> list = List();
-    list.add(ArkRepository.createListPro(objKey, proName, na, ctp, dt));
-    await Future.wait(list);
-    return list[0];
+    return await ArkRepository.createListPro(objKey, proName, na, ctp, dt);
   }
 
   /// 修改属性
@@ -90,7 +87,7 @@ class CommonProListModel extends ViewStateRefreshListModel {
   /// 删除属性
   Future<bool> deletePro() async {
     List<Future> futures = List();
-    futures.add(ArkRepository.deletePro(objKey, proName));
+    futures.add(ArkRepository.deleteListPro(objKey, proName));
     await Future.wait(futures);
     return futures[0];
   }

@@ -45,10 +45,13 @@ class HorizontalChartState extends State<HorizontalChart> {
   List<ChartSeries<_ChartData, String>> getGradientAreaSeries() {
     /// 构建 x，y 轴的数据
 
-    List<_ChartData> chartData=List();
-    if(widget.property!=null && widget.property.data!=null && widget.property.data.dt.isNotEmpty){
-      for(var dt in widget.property.data.dt){
-        chartData.add(_ChartData(x: dt.time.toString(),y: dt.content));
+    List<_ChartData> chartData = List();
+    if (widget.property != null &&
+        widget.property.data != null &&
+        widget.property.data.dt != null &&
+        widget.property.data.dt.length > 0) {
+      for (var dt in widget.property.data.dt) {
+        chartData.add(_ChartData(x: dt.time.toString(), y: dt.content));
       }
     }
     final List<double> stops = <double>[];
@@ -73,7 +76,7 @@ class HorizontalChartState extends State<HorizontalChart> {
         ], stops: <double>[
           0.01,
           0.5
-        ],begin: Alignment.bottomCenter, end: Alignment.topCenter),
+        ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
         borderWidth: 2,
         markerSettings: MarkerSettings(
             isVisible: true,

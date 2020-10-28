@@ -60,14 +60,17 @@ class ObjectListEditViewState extends State<ObjectListEditView> {
                 print('编辑');
                 _currentModel
                     .propertyEdit(
-                        naController.text, StringUtils.isNotEmpty(posController.text)
-                    ? int.parse(posController.text)
-                    : -1)
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
+                            ? int.parse(posController.text)
+                            : -1)
                     .then((value) {
                   if (value) {
                     Toast.show('属性编辑成功');
-                    _detailProModel.updateListProNa(widget.proName,
-                        naController.text, StringUtils.isNotEmpty(posController.text)
+                    _detailProModel.updateListProNa(
+                        widget.proName,
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
                             ? int.parse(posController.text)
                             : -1);
                   }
@@ -80,6 +83,9 @@ class ObjectListEditViewState extends State<ObjectListEditView> {
                     .then((value) {
                   if (value) {
                     Toast.show('创建成功');
+                    _detailProModel.addListPro(proController.text,
+                        naController.text, Constant.object_list_pro,
+                        list: _currentModel.list);
                     NavigatorUtils.goBackWithParams(context, true);
                   }
                 });
@@ -96,22 +102,22 @@ class ObjectListEditViewState extends State<ObjectListEditView> {
           }
         },
         builder: (context, model, child) {
-          if (model.isBusy) {
-            return SkeletonList(
-              builder: (context, index) => ArkSkeletonItem(),
-            );
-          } else if (model.isError && model.list.isEmpty) {
-            return ViewStateErrorWidget(
-              error: model.viewStateError,
-              onPressed: model.initData(),
-            );
-          } else if (model.isEmpty) {
-            return ViewStateEmptyWidget(
-              onPressed: () {
-                model.initData();
-              },
-            );
-          }
+//          if (model.isBusy) {
+//            return SkeletonList(
+//              builder: (context, index) => ArkSkeletonItem(),
+//            );
+//          } else if (model.isError && model.list.isEmpty) {
+//            return ViewStateErrorWidget(
+//              error: model.viewStateError,
+//              onPressed: model.initData(),
+//            );
+//          } else if (model.isEmpty) {
+//            return ViewStateEmptyWidget(
+//              onPressed: () {
+//                model.initData();
+//              },
+//            );
+//          }
           _currentModel = model;
           return Flex(
             direction: Axis.vertical,
@@ -131,7 +137,7 @@ class ObjectListEditViewState extends State<ObjectListEditView> {
           behavior: HitTestBehavior.opaque,
           child: Container(
             height: 40,
-            margin: EdgeInsets.only(left: 40, right: 40,bottom: 10,top: 10),
+            margin: EdgeInsets.only(left: 40, right: 40, bottom: 10, top: 10),
             decoration: BoxDecoration(
                 color: MyColors.white,
                 borderRadius: BorderRadius.circular(5),
@@ -150,8 +156,8 @@ class ObjectListEditViewState extends State<ObjectListEditView> {
 
   @override
   void initState() {
-    proController.text=widget.proName;
-    naController.text=widget.na;
+    proController.text = widget.proName;
+    naController.text = widget.na;
     super.initState();
   }
 

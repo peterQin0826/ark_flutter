@@ -95,4 +95,9 @@ class BmTableModel extends ViewStateRefreshListModel {
   Future<bool> bmTableEditPro(String na, int pos) async {
     return await ArkRepository.bmTableEditPro(objKey, proName, na, pos);
   }
+
+  /// 创建 Bmtable  属性
+  Future<bool> createBmPro(String property_name, String na, String data) async {
+    return await ArkRepository.createBmPro(objKey, property_name, na, data);
+  }
 }

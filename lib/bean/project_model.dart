@@ -2,6 +2,7 @@ class ProjectModel {
   String project;
   int total;
   List<ConceptLi> conceptLi;
+  String permission;
 
   ProjectModel({this.project, this.total, this.conceptLi});
 
@@ -39,13 +40,13 @@ class ConceptLi {
 
   ConceptLi(
       {this.conceptName,
-        this.code,
-        this.type,
-        this.parent,
-        this.project,
-        this.children,
-        this.objectsNumber,
-        this.childrenNumber});
+      this.code,
+      this.type,
+      this.parent,
+      this.project,
+      this.children,
+      this.objectsNumber,
+      this.childrenNumber});
 
   ConceptLi.fromJson(Map<String, dynamic> json) {
     conceptName = json['concept_name'];

@@ -42,22 +42,21 @@ class FileListEditView extends StatefulWidget {
   FileListEditViewState createState() => new FileListEditViewState();
 }
 
-TextEditingController proController = TextEditingController();
-TextEditingController naController = TextEditingController();
-TextEditingController posController = TextEditingController();
-
-DetailProModel detailProModel;
 
 class FileListEditViewState extends State<FileListEditView>
     with AutomaticKeepAliveClientMixin {
   TextStyle style = TextStyle(color: MyColors.color_black, fontSize: 16);
   CommonProListModel _currentModel;
+  DetailProModel detailProModel;
+
+  TextEditingController proController = TextEditingController();
+  TextEditingController naController = TextEditingController();
+  TextEditingController posController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
-    String title = null != widget.proName ? '文件编辑' : '文件列表创建';
-    detailProModel = Provider.of<DetailProModel>(context, listen: false);
-    print('文件列表：${detailProModel.key}');
+    String title = StringUtils.isNotEmpty(widget.proName) ? '文件编辑' : '文件列表创建';
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(title),
@@ -89,13 +88,17 @@ class FileListEditViewState extends State<FileListEditView>
                   }
                 });
               } else {
-                /// create file property
+                /// create file prperty
+
+                String data = json.encode(_currentModel.list);
+                print('===========> ${data}');
                 _currentModel
                     .createListPro(proController.text, naController.text,
-                        Constant.file, json.encode(_currentModel.list))
+                        Constant.file, data)
                     .then((value) {
                   if (value) {
                     Toast.show('属性创建成功');
+                    detailProModel.addListPro(proController.text,naController.text,Constant.file_list_pro,list: _currentModel.list);
                     NavigatorUtils.goBackWithParams(context, true);
                   }
                 });
@@ -107,20 +110,11 @@ class FileListEditViewState extends State<FileListEditView>
       body: ProviderWidget<CommonProListModel>(
           model: CommonProListModel(widget.objKey, widget.proName),
           onModelReady: (model) {
-            if (widget.proName.isNotEmpty) {
+            if (StringUtils.isNotEmpty(widget.proName)) {
               model.initData();
             }
           },
           builder: (context, model, child) {
-            if (model.isBusy) {
-              return SkeletonList(
-                builder: (context, index) => ArkSkeletonItem(),
-              );
-            } else if (model.list.isEmpty) {
-              return ViewStateEmptyWidget(
-                onPressed: model.initData(),
-              );
-            }
             _currentModel = model;
             return Flex(
               direction: Axis.vertical,
@@ -331,6 +325,8 @@ class FileListEditViewState extends State<FileListEditView>
   void initState() {
     proController.text = widget.proName;
     naController.text = widget.na;
+
+    detailProModel = Provider.of<DetailProModel>(context, listen: false);
     super.initState();
     createUploadDirectory();
   }

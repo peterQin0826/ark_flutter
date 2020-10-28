@@ -1,4 +1,8 @@
+
+
 import 'package:ark/bean/basic_detail_bean.dart';
+import 'package:ark/common/common.dart';
+import 'package:ark/configs/router_manager.dart';
 import 'package:ark/model/detail_model.dart';
 import 'package:ark/provider/provider_widget.dart';
 import 'package:ark/res/colors.dart';
@@ -6,6 +10,7 @@ import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/utils/image_utils.dart';
 import 'package:ark/utils/utils.dart';
 import 'package:ark/widgets/ark_skeleton.dart';
+import 'package:ark/widgets/popup.dart';
 import 'package:ark/widgets/skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:common_utils/common_utils.dart';
@@ -64,7 +69,28 @@ class ObjectDetailViewState extends State<ObjectDetailView>
               ),
               onPressed: () {
                 String objKey = _detailModel.basicDetailBean.basicDict.objKey;
-                print('新增：$objKey');
+                List<String> list = List();
+                list.add('短标签');
+                list.add('文本列表');
+                list.add('数值映射表');
+                list.add('文本映射表');
+                list.add('引用列表');
+                list.add('视频列表');
+                list.add('图片列表');
+                list.add('时间列表');
+                list.add('文件列表');
+                Navigator.push(
+                    context,
+                    PopRoute(
+                      child: Popup(
+                        data: list,
+                        right: 15,
+                        top: 40,
+                        onClick: (name) {
+                          _clickPosName(name);
+                        },
+                      ),
+                    ));
               },
             )
           ],
@@ -88,8 +114,7 @@ class ObjectDetailViewState extends State<ObjectDetailView>
               ),
             );
           },
-        )
-    );
+        ));
   }
 
   @override
@@ -100,11 +125,10 @@ class ObjectDetailViewState extends State<ObjectDetailView>
 
   List<Widget> _getTabList() {
     return tabTxt
-        .map((item) =>
-        Text(
-          '$item',
-          style: TextStyle(fontSize: 15),
-        ))
+        .map((item) => Text(
+              '$item',
+              style: TextStyle(fontSize: 15),
+            ))
         .toList();
   }
 
@@ -132,12 +156,52 @@ class ObjectDetailViewState extends State<ObjectDetailView>
         tabController: _tabController,
         objKey: model.basicDetailBean.basicDict.objKey,
         conceptName: model.basicDetailBean.basicDict.conceptName,
+        objName: model.basicDetailBean.basicDict.objName,
       ),
     );
   }
 
   @override
   bool get wantKeepAlive => true;
+
+  void _clickPosName(String name) {
+    switch (name) {
+      case '短标签':
+        Navigator.pushNamed(context, RouteName.short_pro_edit,
+            arguments: [widget.objKey]);
+        break;
+      case '文本列表':
+        Navigator.pushNamed(context, RouteName.text_list_edit_view,
+            arguments: [widget.objKey, '', '']);
+        break;
+      case '数值映射表':
+        Navigator.pushNamed(context, RouteName.bf_edit_view,
+            arguments: [widget.objKey, '', '']);
+        break;
+      case '文本映射表':
+        Navigator.pushNamed(context, RouteName.bm_edit_view,
+            arguments: [widget.objKey, '', '']);
+        break;
+      case '引用列表':
+        break;
+      case '视频列表':
+        Navigator.pushNamed(context, RouteName.img_video_edit,
+            arguments: [widget.objKey, '', '', Constant.video]);
+        break;
+      case '图片列表':
+        Navigator.pushNamed(context, RouteName.img_video_edit,
+            arguments: [widget.objKey, '', '', Constant.image]);
+        break;
+      case '时间列表':
+        Navigator.pushNamed(context, RouteName.time_edit,
+            arguments: [widget.objKey, '', '']);
+        break;
+      case '文件列表':
+        Navigator.pushNamed(context, RouteName.file_edit_view,
+            arguments: [widget.objKey, '', '']);
+        break;
+    }
+  }
 }
 
 /// 构建头部信息
@@ -148,48 +212,50 @@ _basicInfoView(DetailModel model) {
     child: Flex(
       direction: Axis.horizontal,
       children: <Widget>[
-        Container(
-          width: 100,
-          height: 100,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Stack(
-              alignment: Alignment.bottomLeft,
-              children: <Widget>[
-                CachedNetworkImage(
-                  imageUrl: ImageUtils.getImgUrl(
-                      model.basicDetailBean.basicDict.image),
-                  fit: BoxFit.cover,
-                  placeholder: (context, img) => CircularProgressIndicator(),
-                  errorWidget: (context, img, error) =>
-                      Image.asset(Utils.getImgPath('img_empty')),
-                ),
-//                FadeInImage.assetNetwork(
-//                  image: ImageUtils.getImgUrl(model.basicDetailBean.basicDict.image),
-//                  width: 100,
-//                  height: 100,
-//                  placeholder: 'assets/images/img_empty.png',
-//                  fit: BoxFit.cover,
-//                ),
-                Positioned(
-                  child: Opacity(
-                    opacity: 0.5,
-                    child: Container(
-                      height: 20,
-                      width: 100,
-                      color: MyColors.color_black,
-                      child: Center(
-                        child: Text(
-                          model.basicDetailBean.basicDict.objKey,
-                          style: TextStyle(color: MyColors.white, fontSize: 10),
-                          textAlign: TextAlign.center,
-                        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Stack(
+            alignment: Alignment.bottomLeft,
+            children: <Widget>[
+              CachedNetworkImage(
+                placeholder: (context, img) {
+                  return Image.asset(
+                    Utils.getImgPath('app_icon'),
+                    width: 100,
+                    height: 100,
+                  );
+                },
+                errorWidget: (context,img,obj){
+                  return Image.asset(
+                    Utils.getImgPath('app_icon'),
+                    width: 100,
+                    height: 100,
+                  );
+                },
+                imageUrl: ImageUtils.getImgUrl(
+                    model.basicDetailBean.basicDict.image),
+                fit: BoxFit.cover,
+                height: 100,
+                width: 100,
+              ),
+              Positioned(
+                child: Opacity(
+                  opacity: 0.5,
+                  child: Container(
+                    height: 20,
+                    width: 100,
+                    color: MyColors.color_black,
+                    child: Center(
+                      child: Text(
+                        model.basicDetailBean.basicDict.objKey,
+                        style: TextStyle(color: MyColors.white, fontSize: 10),
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ),
         Expanded(
@@ -237,7 +303,7 @@ _basicInfoView(DetailModel model) {
                   child: Text(
                     model.basicDetailBean.basicDict.summary,
                     style:
-                    TextStyle(color: MyColors.color_6E757C, fontSize: 14),
+                        TextStyle(color: MyColors.color_6E757C, fontSize: 14),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -269,8 +335,8 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => math.max((minHeight ?? kToolbarHeight), minExtent);
 
   @override
-  Widget build(BuildContext context, double shrinkOffset,
-      bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return child;
   }
 

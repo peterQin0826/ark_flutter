@@ -18,6 +18,7 @@ import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
 import 'package:ark/utils/utils.dart';
 import 'package:ark/widgets/ark_skeleton.dart';
+import 'package:ark/widgets/detail/image_video_item.dart';
 import 'package:ark/widgets/skeleton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,7 @@ class ListTextEditViewState extends State<TextListEditView> {
 
   @override
   Widget build(BuildContext context) {
+    print('文本列表：==》${widget.proName.isNotEmpty}');
     return new Scaffold(
         appBar: new AppBar(
           centerTitle: true,
@@ -83,12 +85,15 @@ class ListTextEditViewState extends State<TextListEditView> {
                   });
                 } else {
                   print('新建');
+                  String data = json.encode(textListModel.list);
+                  print('===========> ${data}');
                   textListModel
                       .createListPro(proNameController.text, naController.text,
-                          Constant.txt_ctp, json.encode(textListModel.list))
+                          Constant.txt_ctp, data)
                       .then((value) {
                     if (value) {
                       Toast.show('创建成功');
+                      detailProModel.addListPro(proNameController.text,naController.text,Constant.txt_list_pro,list: textListModel.list);
                       NavigatorUtils.goBackWithParams(context, true);
                     }
                   });
@@ -105,20 +110,6 @@ class ListTextEditViewState extends State<TextListEditView> {
             }
           },
           builder: (context, model, position) {
-            if (model.isBusy) {
-              return SkeletonList(
-                builder: (context, index) => ArkSkeletonItem(),
-              );
-            } else if (model.isError && model.list.isEmpty) {
-              return ViewStateErrorWidget(
-                error: model.viewStateError,
-                onPressed: model.initData(),
-              );
-            } else if (model.isEmpty) {
-              return ViewStateEmptyWidget(
-                onPressed: model.initData(),
-              );
-            }
             textListModel = model;
             return Flex(
               direction: Axis.vertical,
@@ -176,7 +167,11 @@ class ListTextEditViewState extends State<TextListEditView> {
                     controller: model.refreshController,
                     header: WaterDropHeader(),
                     footer: RefresherFooter(),
-                    onRefresh: model.refresh,
+                    onRefresh: () {
+                      if (StringUtils.isNotEmpty(widget.proName)) {
+                        model.refresh();
+                      }
+                    },
                     onLoading: () {
                       model.loadMore(total: model.propertyListBean.total);
                     },
@@ -343,7 +338,7 @@ class ListTextEditViewState extends State<TextListEditView> {
                           );
                         }),
                   ),
-                )
+                ),
               ],
             );
           },
@@ -424,6 +419,7 @@ class ListTextEditViewState extends State<TextListEditView> {
                                         Toast.show('删除属性成功');
                                         detailProModel
                                             .deleteListPro(widget.proName);
+                                        Navigator.of(context).pop(true);
                                         NavigatorUtils.goBack(context);
                                       }
                                     });

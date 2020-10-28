@@ -7,8 +7,9 @@ class DetailTabBarView extends StatefulWidget {
   final TabController tabController;
   final String objKey;
   final String conceptName;
+  final String objName;
 
-  const DetailTabBarView({this.tabController, this.objKey, this.conceptName});
+  const DetailTabBarView({this.tabController, this.objKey, this.conceptName,this.objName});
 
   @override
   DetailTabBarViewState createState() => new DetailTabBarViewState();
@@ -22,7 +23,7 @@ class DetailTabBarViewState extends State<DetailTabBarView> {
         objKey: widget.objKey,
         conceptName: widget.conceptName,
       ),
-      DetailRelationTab()
+      DetailRelationTab(widget.objKey,widget.objName)
     ];
 
     return TabBarView(

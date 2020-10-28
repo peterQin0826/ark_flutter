@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:ark/bean/bmtable_bean.dart';
 import 'package:ark/bean/short_property.dart';
+import 'package:ark/common/common.dart';
 import 'package:ark/model/bmtable_model.dart';
 import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/provider/provider_widget.dart';
@@ -79,6 +81,34 @@ class BmTableEditViewState extends State<BmTableEditView> {
                 });
               } else {
                 print('新建');
+                BmTableBean bmtable = BmTableBean();
+                bmtable.propertyName = proNameController.text;
+                bmtable.na = naController.text;
+
+                List<ShortProperty> bmDatas = List();
+                Map<String, String> map = Map();
+                if (bmTableModel.list.length > 0) {
+                  for (var table in bmTableModel.list) {
+                    ShortProperty short = table as ShortProperty;
+                    bmDatas.add(short);
+                    map[short.key] = short.value;
+                  }
+                }
+                bmtable.total = bmDatas.length;
+                bmtable.bmDatas = bmDatas;
+
+                bmTableModel
+                    .createBmPro(proNameController.text, naController.text,
+                        json.encode(map))
+                    .then((value) {
+                  if (value) {
+                    Toast.show('创建成功');
+                    detailProModel.addListPro(proNameController.text,
+                        naController.text, Constant.bm_pro,
+                        bmTableBean: bmtable);
+                    NavigatorUtils.goBackWithParams(context, true);
+                  }
+                });
               }
             },
           )
@@ -86,23 +116,12 @@ class BmTableEditViewState extends State<BmTableEditView> {
       ),
       body: ProviderWidget<BmTableModel>(
         model: BmTableModel(objKey: widget.objKey, proName: widget.proName),
-        onModelReady: (model) => model.initData(),
-        builder: (context, model, child) {
-          if (model.isBusy) {
-            return SkeletonList(
-              builder: (context, index) => ArkSkeletonItem(),
-            );
-          } else if (model.isError && model.list.isEmpty) {
-            return ViewStateErrorWidget(
-              error: model.viewStateError,
-              onPressed: model.initData(),
-            );
-          } else if (model.isEmpty) {
-            return ViewStateEmptyWidget(
-              onPressed: model.initData(),
-            );
+        onModelReady: (model) {
+          if (StringUtils.isNotEmpty(widget.proName)) {
+            model.initData();
           }
-
+        },
+        builder: (context, model, child) {
           bmTableModel = model;
 
           return Flex(

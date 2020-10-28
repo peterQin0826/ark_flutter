@@ -8,6 +8,7 @@ import 'package:ark/model/image_video_list_model.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/utils/date_utils.dart';
 import 'package:ark/utils/image_utils.dart';
+import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
 import 'package:ark/utils/utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -43,6 +44,7 @@ class ImageVideoItemState extends State<ImageVideoItem>
       imgUrl =
           ImageUtils.getImgUrl(widget.imgContent.content + Constant.videoCover);
     }
+    print('图片地址==> $imgUrl');
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5), color: MyColors.white),
@@ -79,16 +81,25 @@ class ImageVideoItemState extends State<ImageVideoItem>
                               return ConfirmDialog(
                                 content: '确定要删除？',
                                 confirmClicked: () {
-                                  model
-                                      .deleteItem(json.encode(idList))
-                                      .then((value) {
-                                    if (value) {
-                                      Toast.show('删除成功');
-                                      model.list.removeAt(widget.index);
-                                      detailProModel.deleteListItem(
-                                          widget.imgContent.id, widget.proName);
-                                    }
-                                  });
+                                  if(StringUtils.isNotEmpty(widget.proName)){
+                                    model
+                                        .deleteItem(json.encode(idList))
+                                        .then((value) {
+                                      if (value) {
+                                        Toast.show('删除成功');
+                                        model.list.removeAt(widget.index);
+                                        detailProModel.deleteListItem(
+                                            widget.imgContent.id, widget.proName);
+                                      }
+                                    });
+                                  }else{
+                                    print('======> ${model.list.length}');
+                                    model.list.removeAt(widget.index);
+                                    setState(() {
+
+                                    });
+                                  }
+
                                 },
                               );
                             });

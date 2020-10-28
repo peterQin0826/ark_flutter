@@ -195,6 +195,9 @@ flutter:
     - assets/images/img_close.png
     - assets/images/click_more.png
     - assets/tp.json
+    - assets/images/realtion_loadmore.png
+    - assets/images/delete_relation.png
+    - assets/images/relation_add.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

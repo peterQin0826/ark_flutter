@@ -1,6 +1,5 @@
-
-
 import 'package:ark/common/sp_constant.dart';
+import 'package:ark/configs/router_manager.dart';
 import 'package:ark/net/dio_utils.dart';
 import 'package:ark/net/http_api.dart';
 import 'package:ark/net/http_method.dart';
@@ -103,8 +102,11 @@ class MyLoginState extends State<MyLogin> {
           switch (pos) {
             case 1:
               print('点击了+${pos}');
+              Navigator.pushNamed(context, RouteName.create_user,
+                  arguments: [null]);
               break;
             case 2:
+              Navigator.pushNamed(context, RouteName.existing_users);
               break;
             case 3:
               break;
@@ -128,15 +130,14 @@ class MyLoginState extends State<MyLogin> {
                           onPressed: () {
                             DioUtils.instance
                                 .request(HttpMethod.GET, HttpApi.logout,
-                                success: (data) {
-                                  Navigator.of(context).pop(true);
-                                  SpUtil.clear();
-                                  NavigatorUtils.push(
-                                      context, Routers.login, replace: true,
-                                      clearStack: true);
-                                }, error: (e) {
-                                  LogUtil.e('xioapeng,异常${e.toString()}');
-                                });
+                                    success: (data) {
+                              Navigator.of(context).pop(true);
+                              SpUtil.clear();
+                              NavigatorUtils.push(context, Routers.login,
+                                  replace: true, clearStack: true);
+                            }, error: (e) {
+                              LogUtil.e('xioapeng,异常${e.toString()}');
+                            });
                           },
                           child: Text('确定'),
                         )
@@ -148,7 +149,7 @@ class MyLoginState extends State<MyLogin> {
         },
         child: Padding(
           padding:
-          EdgeInsets.only(left: 15, right: 15, top: pos == 1 ? 30 : 20),
+              EdgeInsets.only(left: 15, right: 15, top: pos == 1 ? 30 : 20),
           child: Column(
             children: <Widget>[
               Flex(

@@ -13,4 +13,5 @@ class EventObj<T> {
 enum Event {
   search_key,
   replace_object,
+  add_relation,
 }

@@ -4,24 +4,24 @@ import 'package:ark/bean/number_key_value_bean.dart';
 import 'package:ark/bean/property_list_bean.dart';
 import 'package:ark/bean/short_property.dart';
 import 'package:ark/bean/summary_info.dart';
+import 'package:ark/common/common.dart';
 import 'package:ark/net/dio_utils.dart';
 import 'package:ark/net/http_api.dart';
 import 'package:ark/net/http_method.dart';
 import 'package:ark/provider/view_state_model.dart';
 import 'package:ark/service/ark_repository.dart';
+import 'package:ark/utils/string_utils.dart';
 import 'package:common_utils/common_utils.dart';
 
 class DetailProModel extends ViewStateModel {
+  String objKey;
+  String conceptName;
+
   List<PropertyListBean> _propertyList = List();
 
   List<PropertyListBean> get propertyList => _propertyList;
 
-  String _key;
-
-  String get key => _key;
-
   Future<List> getProList(String objKey, String conceptName) async {
-    _key = objKey;
     List<Future> list = List();
     List<Future> proFutureList = List();
     SummaryInfo summaryInfo;
@@ -302,8 +302,7 @@ class DetailProModel extends ViewStateModel {
   deleteListPro(String proName) {
     if (_propertyList.isNotEmpty) {
       for (var pro in _propertyList) {
-        if (pro.propertyName != null &&
-            Comparable.compare(pro.propertyName, proName) == 0) {
+        if (pro.propertyName != null && pro.propertyName == proName) {
           _propertyList.remove(pro);
           notifyListeners();
           break;
@@ -371,12 +370,17 @@ class DetailProModel extends ViewStateModel {
   /// 更新别称
   updateListProNa(String pro, String na, int pos,
       {bool isBf = false, bool isBm = false}) {
+    print('更新别称：${_propertyList.length}     =>${propertyList.length}');
+
     for (var property in _propertyList) {
-      print('开始更新别称：${property.propertyName}');
-      if (property.propertyName != null && property.propertyName == pro) {
+      print('遍历数组');
+      if (StringUtils.isNotEmpty(property.propertyName) &&
+          property.propertyName == pro) {
+        print('开始更新别称：${property.propertyName}');
         if (property.data != null) {
           property.data.na = na;
           property.data.pos = pos;
+
           notifyListeners();
           break;
         }
@@ -385,14 +389,52 @@ class DetailProModel extends ViewStateModel {
         if (property.bfTableBean.propertyName == pro) {
           property.bfTableBean.na = na;
           property.data.pos = pos;
+
+          notifyListeners();
+          break;
         }
       }
       if (isBm && property.bmTableBean != null) {
         if (property.bmTableBean.propertyName == pro) {
           property.bmTableBean.na = na;
           property.data.pos = pos;
+
+          notifyListeners();
+          break;
         }
       }
     }
+  }
+
+  /// 添加属性区块
+  addListPro(String proName, String na, int itemType,
+      {List<dynamic> list, BmTableBean bmTableBean, BfTableBean bfTableBean}) {
+    PropertyListBean proValue = PropertyListBean();
+
+    if (itemType == Constant.bf_pro) {
+      proValue.bfTableBean = bfTableBean;
+      proValue.itemType = itemType;
+    } else if (itemType == Constant.bm_pro) {
+      proValue.bmTableBean = bmTableBean;
+      proValue.itemType = itemType;
+    } else {
+      proValue.itemType = itemType;
+      proValue.propertyName = proName;
+      PropertyListData data = PropertyListData();
+      data.na = na;
+
+      List<Dt> dtList = List();
+      if (list.length > 0) {
+        for (var data in list) {
+          dtList.add(data);
+        }
+      }
+
+      data.dt = dtList;
+      proValue.data = data;
+      proValue.total = dtList.length;
+    }
+    _propertyList.add(proValue);
+    notifyListeners();
   }
 }

@@ -35,12 +35,25 @@ class Constant {
   static const String text_replace_value = 'text_replace_value';
   static const String object_replace_value = 'object_replace_value';
   static const String object_replace_object = 'object_replace_object';
+  static const String add_relation = 'add_relation';
 
   static const String txt_ctp = 'txt';
   static const String image = 'image';
   static const String video = 'video';
   static const String file = 'file';
+  static const String time = 'time';
+  static const String object = 'object';
+
   static const String empty_view = 'img_empty';
+  static const int short_pro = 0;
+  static const int bm_pro = 1;
+  static const int bf_pro = 2;
+  static const int txt_list_pro = 3;
+  static const int img_list_pro = 4;
+  static const int video_list_pro = 5;
+  static const int object_list_pro = 6;
+  static const int time_list_pro = 7;
+  static const int file_list_pro = 8;
 }
 
 class AppConfig {

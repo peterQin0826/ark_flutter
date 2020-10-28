@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:ark/bean/number_key_value_bean.dart';
@@ -7,16 +6,16 @@ import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/provider/provider_widget.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
+import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
+import 'package:ark/widgets/my_number_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class BfTableItemEditView extends StatefulWidget {
-
   String objKey, proName;
   NumberKeyValueBean numberKeyValueBean;
-
 
   BfTableItemEditView(this.objKey, this.proName, this.numberKeyValueBean);
 
@@ -32,14 +31,13 @@ TextEditingController valueController = TextEditingController();
 class BfTableItemEditViewState extends State<BfTableItemEditView> {
   @override
   Widget build(BuildContext context) {
-
     DetailProModel detailProModel =
-    Provider.of<DetailProModel>(context, listen: false);
+        Provider.of<DetailProModel>(context, listen: false);
 
     return ProviderWidget<BfTableModel>(
-      model: BfTableModel(widget.objKey,widget.proName),
-      onModelReady: (model){},
-      builder: (context,model,child){
+      model: BfTableModel(widget.objKey, widget.proName),
+      onModelReady: (model) {},
+      builder: (context, model, child) {
         return Scaffold(
           appBar: new AppBar(
             title: new Text('BfTable编辑页'),
@@ -51,27 +49,34 @@ class BfTableItemEditViewState extends State<BfTableItemEditView> {
                   style: TextStyle(color: MyColors.white, fontSize: 16),
                 ),
                 onPressed: () {
+                  if (keyController.text.isEmpty) {
+                    Toast.show('key值不能为空');
+                    return;
+                  }
+                  Map<String, num> map = new Map();
+                  map[keyController.text] = num.parse(valueController.text);
 
-                    if (keyController.text.isEmpty) {
-                      Toast.show('key值不能为空');
-                      return;
-                    }
-                    Map<String, num> map = new Map();
-                    map[keyController.text] = num.parse(valueController.text);
-
+                  if (StringUtils.isNotEmpty(widget.proName)) {
                     model.editItem(json.encode(map)).then((value) {
                       if (value) {
                         if (widget.numberKeyValueBean.key.isNotEmpty) {
                           Toast.show('更新成功');
-                          detailProModel.updateBfTableItem(widget.proName,
-                              keyController.text, num.parse(valueController.text), false);
+                          detailProModel.updateBfTableItem(
+                              widget.proName,
+                              keyController.text,
+                              num.parse(valueController.text),
+                              false);
                         } else {
                           Toast.show('添加成功');
-                          detailProModel.updateBfTableItem(widget.proName,
-                              keyController.text, num.parse(valueController.text), true);
+                          detailProModel.updateBfTableItem(
+                              widget.proName,
+                              keyController.text,
+                              num.parse(valueController.text),
+                              true);
                         }
 
-                        NumberKeyValueBean numKeyValue = new NumberKeyValueBean();
+                        NumberKeyValueBean numKeyValue =
+                            new NumberKeyValueBean();
                         numKeyValue.key = keyController.text;
                         numKeyValue.value = num.parse(valueController.text);
                         NavigatorUtils.goBackWithParams(context, numKeyValue);
@@ -79,7 +84,12 @@ class BfTableItemEditViewState extends State<BfTableItemEditView> {
                         Toast.show('更新失败');
                       }
                     });
-
+                  }else{
+                    NumberKeyValueBean numkeyValue =new NumberKeyValueBean();
+                    numkeyValue.key=keyController.text;
+                    numkeyValue.value=num.parse(valueController.text);
+                    NavigatorUtils.goBackWithParams(context, numkeyValue);
+                  }
                 },
               )
             ],
@@ -109,9 +119,9 @@ class BfTableItemEditViewState extends State<BfTableItemEditView> {
                             decoration: InputDecoration(
                                 labelStyle: valueStyle,
                                 enabled:
-                                widget.numberKeyValueBean.key.isNotEmpty
-                                    ? false
-                                    : true),
+                                    widget.numberKeyValueBean.key.isNotEmpty
+                                        ? false
+                                        : true),
                           ),
                         ),
                       )
@@ -134,7 +144,9 @@ class BfTableItemEditViewState extends State<BfTableItemEditView> {
                           child: TextField(
                             controller: valueController,
                             decoration: InputDecoration(labelStyle: valueStyle),
-                            inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+                            inputFormatters: [
+                              MyNumberTextInputFormatter(digit: 3)
+                            ],
                             keyboardType: TextInputType.number,
                           ),
                         ),
@@ -149,6 +161,7 @@ class BfTableItemEditViewState extends State<BfTableItemEditView> {
       },
     );
   }
+
   @override
   void initState() {
     if (widget.numberKeyValueBean != null) {
@@ -160,8 +173,6 @@ class BfTableItemEditViewState extends State<BfTableItemEditView> {
 
   @override
   void dispose() {
-
     super.dispose();
   }
-
 }

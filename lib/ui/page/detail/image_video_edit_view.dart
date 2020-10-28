@@ -97,7 +97,7 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
               style: TextStyle(color: MyColors.white, fontSize: 16),
             ),
             onPressed: () {
-              if (widget.proName.isNotEmpty) {
+              if (StringUtils.isNotEmpty(widget.proName)) {
                 print('编辑，不分类型');
                 _currentModel
                     .propertyEdit(
@@ -120,10 +120,13 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                 });
               } else {
                 String ctp;
+                int type;
                 if (Comparable.compare(widget.type, Constant.image) == 0) {
                   ctp = 'img';
+                  type = Constant.img_list_pro;
                 } else {
                   ctp = 'video';
+                  type = Constant.video_list_pro;
                 }
                 _currentModel
                     .createListPro(proController.text, naController.text, ctp,
@@ -131,6 +134,9 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                     .then((value) {
                   if (value) {
                     Toast.show('属性创建成功');
+                    detailProModel.addListPro(
+                        proController.text, naController.text, type,
+                        list: _currentModel.list);
                     NavigatorUtils.goBackWithParams(context, true);
                   }
                 });
@@ -142,20 +148,11 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
       body: ProviderWidget<CommonProListModel>(
         model: CommonProListModel(widget.objKey, widget.proName),
         onModelReady: (model) {
-          if (widget.proName.isNotEmpty) {
+          if (StringUtils.isNotEmpty(widget.proName)) {
             model.initData();
           }
         },
         builder: (context, model, child) {
-          if (model.isBusy) {
-            return SkeletonList(
-              builder: (context, index) => ArkSkeletonItem(),
-            );
-          } else if (model.list.isEmpty) {
-            return ViewStateEmptyWidget(
-              onPressed: model.initData(),
-            );
-          }
           _currentModel = model;
           return Flex(
             direction: Axis.vertical,
@@ -209,9 +206,18 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                   controller: model.refreshController,
                   header: WaterDropHeader(),
                   footer: RefresherFooter(),
-                  onRefresh: model.refresh,
-                  onLoading: model.loadMore,
-                  enablePullUp: true,
+                  onRefresh: (){
+                    if(StringUtils.isNotEmpty(widget.proName)){
+                      model.refresh();
+                    }
+                  },
+                  onLoading: (){
+                    if(StringUtils.isNotEmpty(widget.proName)){
+                      model.loadMore();
+                    }
+                  },
+                  enablePullUp: StringUtils.isNotEmpty(widget.proName),
+                  enablePullDown: StringUtils.isNotEmpty(widget.proName),
                   child: GridView.builder(
                       padding: EdgeInsets.only(left: 10, right: 10),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -227,11 +233,141 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                         if (widget.type == Constant.image) {
                           imgUrl = ImageUtils.getImgUrl(imgContent.content);
                         } else {
-                          imgUrl = ImageUtils.getImgUrl(
-                              imgContent.content + Constant.videoCover);
+                          imgUrl =
+                              ImageUtils.getImgUrl(imgContent.content + Constant.videoCover);
                         }
-                        print('图片地址==> $imgUrl');
-                        return ImageVideoItem(widget.objKey, widget.proName,
+                        return Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5), color: MyColors.white),
+                          child: Flex(
+                            direction: Axis.vertical,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 1,
+                                child: Stack(
+                                  alignment: Alignment.topRight,
+                                  children: <Widget>[
+                                    /// 矩形剪裁 => ClipRRect;      圆形 剪裁 => ClipOval()
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.all(Radius.circular(3)),
+                                      child: CachedNetworkImage(
+                                        imageUrl: imgUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, img) => CircularProgressIndicator(),
+                                        height: 175,
+                                        width: 175,
+                                      ),
+                                    ),
+                                    Positioned(
+                                      child: GestureDetector(
+                                          onTap: () {
+
+                                            print('删除条目');
+                                            List<int> idList = List();
+                                            idList.add(imgContent.id);
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return ConfirmDialog(
+                                                    content: '确定要删除？',
+                                                    confirmClicked: () {
+                                                      if(StringUtils.isNotEmpty(widget.proName)){
+                                                        model
+                                                            .deleteItem(json.encode(idList))
+                                                            .then((value) {
+                                                          if (value) {
+                                                            Toast.show('删除成功');
+                                                            model.list.removeAt(index);
+                                                            detailProModel.deleteListItem(
+                                                                imgContent.id, widget.proName);
+                                                          }
+                                                        });
+                                                      }else{
+                                                        print('======> ${model.list.length}');
+                                                        model.list.removeAt(index);
+                                                        setState(() {
+
+                                                        });
+                                                      }
+
+                                                    },
+                                                  );
+                                                });
+                                          },
+                                          child: Image.asset(
+                                            Utils.getImgPath('img_close'),
+                                            width: 18,
+                                            height: 18,
+                                          )),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () {
+                                  Navigator.pushNamed(context, RouteName.img_video_item_edit,
+                                      arguments: [
+                                        widget.objKey,
+                                        widget.proName,
+                                        imgContent,
+                                        widget.type
+                                      ]).then((value) {
+                                    if (null != value) {
+                                      Dt dt = value as Dt;
+                                      imgContent.info = dt.info;
+                                     imgContent.title = dt.title;
+                                     imgContent.content = dt.content;
+                                     imgContent.time = dt.time;
+                                      setState(() {});
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        imgContent.title != null
+                                            ? imgContent.title
+                                            : '',
+                                        style: TextStyle(
+                                            color: MyColors.color_black,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 3),
+                                        child: Text(
+                                          Utils.getIndexName(imgContent.info, 3).isNotEmpty
+                                              ? Utils.getIndexName(imgContent.info, 3)
+                                              : '',
+                                          style: TextStyle(
+                                            color: MyColors.color_2E333C,
+                                            fontSize: 14,
+                                          ),
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 3),
+                                        child: Text(
+                                          DateUtils.formatDateMsByYMDHM(imgContent.time),
+                                          style:
+                                          TextStyle(color: MyColors.color_697796, fontSize: 12),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                          ImageVideoItem(widget.objKey, widget.proName,
                             widget.type, imgContent, index);
                       }),
                 ),
@@ -244,7 +380,7 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
         elevation: 0,
         child: Container(
           height: 60,
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.only(left: 15,right: 15),
           child: Flex(
             direction: Axis.horizontal,
             children: <Widget>[
@@ -280,7 +416,7 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
                         });
                   },
                   child: Padding(
-                    padding: EdgeInsets.only(left: 15),
+                    padding: EdgeInsets.only(left: 5),
                     child: Container(
                       height: 38,
                       decoration: BoxDecoration(
@@ -442,6 +578,7 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
           String label = resultObj['label'];
           Dt dt = new Dt();
           dt.content = label;
+          dt.title='';
           String info = '';
 
           if (Comparable.compare(widget.type, Constant.image) == 0) {
@@ -459,7 +596,7 @@ class ImageVideoEditViewState extends State<ImageVideoEditView>
           }
           dt.info = info;
           dt.time = DateUtils.currentTimeMillis();
-          if (widget.proName.isNotEmpty) {
+          if (StringUtils.isNotEmpty(widget.proName)) {
             _currentModel
                 .propertyUnitAdd(label, '', info, DateUtils.currentTimeMillis())
                 .then((value) {

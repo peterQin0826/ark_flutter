@@ -102,12 +102,12 @@ class Dt {
   String title;
   String info;
   int time;
-  int id;
+  int id ;
   ExpandedDataBean expandedDataBean;
 
   List<ShortProperty> infos;
 
-  Dt({this.content, this.title, this.info, this.time, this.id});
+  Dt({this.content, this.title='', this.info, this.time, this.id=0});
 
   Dt.fromJson(Map<String, dynamic> json) {
     content = json['content'];

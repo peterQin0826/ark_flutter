@@ -71,10 +71,7 @@ class TextListModel extends ViewStateRefreshListModel {
   /// 创建属性
   Future<bool> createListPro(
       String proName, String na, String ctp, String dt) async {
-    List<Future> list = List();
-    list.add(ArkRepository.createListPro(obj_key, proName, na, ctp, dt));
-    await Future.wait(list);
-    return list[0];
+    return await ArkRepository.createListPro(obj_key, proName, na, ctp, dt);
   }
 
   /// 修改属性
@@ -87,7 +84,7 @@ class TextListModel extends ViewStateRefreshListModel {
 
   Future<bool> deletePro() async {
     List<Future> futures = List();
-    futures.add(ArkRepository.deletePro(obj_key, property_name));
+    futures.add(ArkRepository.deleteListPro(obj_key, property_name));
     await Future.wait(futures);
     return futures[0];
   }

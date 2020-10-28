@@ -3,6 +3,8 @@ import 'package:ark/net/dio_utils.dart';
 import 'package:ark/net/http_method.dart';
 import 'package:ark/net/net.dart';
 import 'package:ark/provider/view_state_refresh_list_model.dart';
+import 'package:ark/service/ark_repository.dart';
+import 'package:ark/utils/string_utils.dart';
 
 class SearchResultModel extends ViewStateRefreshListModel {
   String _text;
@@ -36,5 +38,13 @@ class SearchResultModel extends ViewStateRefreshListModel {
       }
     }
     notifyListeners();
+  }
+
+  /// 添加关联
+   Future<bool> relationAdd(
+      String source_obj, String target_obj, bool create_mode,
+      {int rel_number, int score, String data}) async {
+    return await ArkRepository.relationAdd(source_obj, target_obj, create_mode,
+        rel_number: rel_number, score: score, data: data);
   }
 }

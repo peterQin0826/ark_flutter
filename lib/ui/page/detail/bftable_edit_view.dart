@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:ark/bean/bftable_bean.dart';
 import 'package:ark/bean/number_key_value_bean.dart';
+import 'package:ark/common/common.dart';
 import 'package:ark/model/bftable_model.dart';
 import 'package:ark/model/detail_pro_model.dart';
 import 'package:ark/provider/provider_widget.dart';
@@ -60,6 +62,14 @@ class BfTableEditViewState extends State<BfTableEditView> {
               style: TextStyle(color: MyColors.white, fontSize: 16),
             ),
             onPressed: () {
+              if (StringUtils.isEmpty(proNameController.text)) {
+                Toast.show('属性名不为空');
+                return;
+              }
+              if (StringUtils.isEmpty(naController.text)) {
+                Toast.show('别称不为空');
+                return;
+              }
               if (widget.proName.isNotEmpty) {
                 currentModel
                     .editBfPro(
@@ -75,11 +85,39 @@ class BfTableEditViewState extends State<BfTableEditView> {
                         naController.text,
                         StringUtils.isNotEmpty(posController.text)
                             ? int.parse(posController.text)
-                            : -1,isBf: true);
+                            : -1,
+                        isBf: true);
                   }
                 });
               } else {
                 print('新建');
+                Map<String, num> map = Map();
+                List<NumberKeyValueBean> list = List();
+                if (currentModel.list.length > 0) {
+                  for (var bftable in currentModel.list) {
+                    NumberKeyValueBean num = bftable as NumberKeyValueBean;
+                    map[num.key] = num.value;
+                    list.add(num);
+                  }
+                }
+
+                currentModel
+                    .createBfPro(proNameController.text, naController.text,
+                        json.encode(map))
+                    .then((value) {
+                  if (value) {
+                    Toast.show('创建成功');
+                    BfTableBean bfTableBean = BfTableBean();
+                    bfTableBean.na = naController.text;
+                    bfTableBean.propertyName = proNameController.text;
+                    bfTableBean.total = list.length;
+                    bfTableBean.bfDatas = list;
+                    detailProModel.addListPro(proNameController.text,
+                        naController.text, Constant.bf_pro,
+                        bfTableBean: bfTableBean);
+                    NavigatorUtils.goBackWithParams(context, true);
+                  }
+                });
               }
             },
           )
@@ -87,22 +125,12 @@ class BfTableEditViewState extends State<BfTableEditView> {
       ),
       body: ProviderWidget<BfTableModel>(
         model: BfTableModel(widget.objKey, widget.proName),
-        onModelReady: (model) => model.initData(),
-        builder: (context, model, child) {
-          if (model.isBusy) {
-            return SkeletonList(
-              builder: (context, index) => ArkSkeletonItem(),
-            );
-          } else if (model.isError && model.list.isEmpty) {
-            return ViewStateErrorWidget(
-              error: model.viewStateError,
-              onPressed: model.initData(),
-            );
-          } else if (model.isEmpty) {
-            return ViewStateEmptyWidget(
-              onPressed: model.initData(),
-            );
+        onModelReady: (model) {
+          if (StringUtils.isNotEmpty(widget.proName)) {
+            model.initData();
           }
+        },
+        builder: (context, model, child) {
           currentModel = model;
           return Flex(
             direction: Axis.vertical,

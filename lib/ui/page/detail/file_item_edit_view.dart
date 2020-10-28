@@ -47,7 +47,7 @@ class FileListItemEditState extends State<FileListItemEdit> {
   Widget build(BuildContext context) {
     DetailProModel detailProModel =
         Provider.of<DetailProModel>(context, listen: false);
-    print('文件列表：${detailProModel.key}');
+
     return new Scaffold(
       appBar: new AppBar(
         centerTitle: true,
@@ -74,7 +74,6 @@ class FileListItemEditState extends State<FileListItemEdit> {
                     Toast.show('更新成功');
                     detailProModel.updateProListItem(
                         widget.dt, widget.proName, false);
-                    print('验证详情页数据：${detailProModel.key}');
                   }
                 });
               }

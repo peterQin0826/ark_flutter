@@ -89,4 +89,10 @@ class BfTableModel extends ViewStateRefreshListModel {
     return await ArkRepository.editBfPro(objKey,  proName, na, pos);
   }
 
+  /// 创建bftabe 属性
+  Future<bool> createBfPro(String property_name, String na, String data) async{
+    return await ArkRepository.createBfPro(objKey,property_name,na,data);
+  }
+
+
 }

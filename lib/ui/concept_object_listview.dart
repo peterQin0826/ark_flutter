@@ -5,6 +5,7 @@ import 'package:ark/provider/provider_widget.dart';
 import 'package:ark/provider/view_state_widget.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
+import 'package:ark/ui/page/object_detail_view.dart';
 import 'package:ark/utils/image_utils.dart';
 import 'package:ark/utils/theme_utils.dart';
 import 'package:ark/utils/time_utils.dart';
@@ -12,6 +13,7 @@ import 'package:ark/utils/utils.dart';
 import 'package:ark/widgets/ark_skeleton.dart';
 import 'package:ark/widgets/skeleton.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -40,99 +42,97 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: new AppBar(
-          automaticallyImplyLeading: false,
-          title: Stack(
-            alignment: Alignment.topLeft,
-            children: <Widget>[
-              Container(
-                child: Flex(
-                  direction: Axis.horizontal,
-                  children: <Widget>[
-                    GestureDetector(
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: MyColors.white,
-                      ),
-                      onTap: () {
-                        NavigatorUtils.goBack(context);
-                      },
+      appBar: new AppBar(
+        automaticallyImplyLeading: false,
+        title: Stack(
+          alignment: Alignment.topLeft,
+          children: <Widget>[
+            Container(
+              child: Flex(
+                direction: Axis.horizontal,
+                children: <Widget>[
+                  GestureDetector(
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: MyColors.white,
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 15),
-                        child: Container(
-                          height: 34,
-                          decoration: BoxDecoration(
-                              color: MyColors.white,
-                              borderRadius: BorderRadius.circular(17)),
-                          child: GestureDetector(
-                            onTap: () {
-                              print('点击了');
-                            },
-                            child: Container(
-                              height: 34,
-                              child: Row(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 15),
-                                    child: Image.asset(
-                                      Utils.getImgPath('main_search'),
-                                      width: 15,
-                                      height: 15,
-                                    ),
+                    onTap: () {
+                      NavigatorUtils.goBack(context);
+                    },
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 15),
+                      child: Container(
+                        height: 34,
+                        decoration: BoxDecoration(
+                            color: MyColors.white,
+                            borderRadius: BorderRadius.circular(17)),
+                        child: GestureDetector(
+                          onTap: () {
+                            print('点击了');
+                          },
+                          child: Container(
+                            height: 34,
+                            child: Row(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15),
+                                  child: Image.asset(
+                                    Utils.getImgPath('main_search'),
+                                    width: 15,
+                                    height: 15,
                                   ),
-                                  Padding(
-                                    padding:
-                                    EdgeInsets.only(left: 5, right: 15),
-                                    child: Text(
-                                      '输入需要搜索的内容',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          color: MyColors.color_C6CAD7),
-                                    ),
-                                  )
-                                ],
-                              ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 5, right: 15),
+                                  child: Text(
+                                    '输入需要搜索的内容',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        color: MyColors.color_C6CAD7),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 20),
-                      child: GestureDetector(
-                          onTap: () {
-                            print('进入概念详情页面');
-                            NavigatorUtils.gotoConceptDetail(
-                                context, _objectListNewModel.objectListBean.code);
-                          },
-                          child: Text(
-                            '概念',
-                            style: titleStyle,
-                          )),
-                    ),
-                    GestureDetector(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 20),
+                    child: GestureDetector(
                         onTap: () {
-                          print('新建的poppupWindow弹窗');
+                          print('进入概念详情页面');
+                          NavigatorUtils.gotoConceptDetail(
+                              context, _objectListNewModel.objectListBean.code);
                         },
                         child: Text(
-                          '新建',
+                          '概念',
                           style: titleStyle,
-                        ))
-                  ],
-                ),
-              )
-            ],
-          ),
+                        )),
+                  ),
+                  GestureDetector(
+                      onTap: () {
+                        print('新建的poppupWindow弹窗');
+                      },
+                      child: Text(
+                        '新建',
+                        style: titleStyle,
+                      ))
+                ],
+              ),
+            )
+          ],
         ),
+      ),
       body: ProviderWidget<ObjectListNewModel>(
           model: ObjectListNewModel(code: widget.code, rn: 30),
           onModelReady: (model) {
             model.initData();
-
-            },
+          },
           builder: (context, model, child) {
             if (model.isBusy) {
               return SkeletonList(
@@ -148,7 +148,7 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
                 onPressed: model.initData(),
               );
             }
-            _objectListNewModel=model;
+            _objectListNewModel = model;
             return SmartRefresher(
               controller: model.refreshController,
               header: WaterDropHeader(),
@@ -165,8 +165,7 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
                     return _item(data);
                   }),
             );
-          }
-      ),
+          }),
     );
   }
 
@@ -187,7 +186,16 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
       behavior: HitTestBehavior.opaque,
       onTap: () {
 //        NavigatorUtils.gotoObjectDetail(context, data.objKey);
-        Navigator.pushNamed(context, RouteName.object_detail,arguments: [data.objKey]);
+//        Navigator.pushNamed(context, RouteName.object_detail,arguments: [data.objKey]);
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                settings: RouteSettings(name: RouteName.object_detail),
+                builder: (context) {
+                  return ObjectDetailView(
+                    objKey: data.objKey,
+                  );
+                }));
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -240,7 +248,7 @@ class ConceptObjectListViewState extends State<ConceptObjectListView>
                     borderRadius: BorderRadius.circular(5),
                     child: CachedNetworkImage(
                       imageUrl: ImageUtils.getImgUrl(data.image),
-                      placeholder: (context,img){
+                      placeholder: (context, img) {
                         return Image.asset(Utils.getImgPath('img_empty'));
                       },
                       fit: BoxFit.cover,

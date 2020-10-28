@@ -115,7 +115,6 @@ class ListItem extends StatefulWidget {
 class ListItemState extends State<ListItem> {
   @override
   Widget build(BuildContext context) {
-    print('刷新： ${widget.position} ===> 总数为：${widget.shortProperties.length}');
     return Slidable(
       actionPane: SlidableScrollActionPane(),
       actionExtentRatio: 0.25,

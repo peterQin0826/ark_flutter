@@ -9,6 +9,7 @@ import 'package:ark/provider/view_state_widget.dart';
 import 'package:ark/res/colors.dart';
 import 'package:ark/routers/fluro_navigator.dart';
 import 'package:ark/ui/helper/refresh_helper.dart';
+import 'package:ark/ui/page/detail/bftable_edit_view.dart';
 import 'package:ark/utils/date_utils.dart';
 import 'package:ark/utils/string_utils.dart';
 import 'package:ark/utils/toast.dart';
@@ -59,18 +60,21 @@ class TimeListState extends State<TimeListEditView> {
               style: TextStyle(color: MyColors.white, fontSize: 16),
             ),
             onPressed: () {
-              if (widget.proName.isNotEmpty) {
+              if (StringUtils.isNotEmpty(widget.proName)) {
                 print('编辑');
                 _currentModel
                     .propertyEdit(
-                    naController.text, StringUtils.isNotEmpty(posController.text)
-                    ? int.parse(posController.text)
-                    : -1)
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
+                            ? int.parse(posController.text)
+                            : -1)
                     .then((value) {
                   if (value) {
                     Toast.show('属性编辑成功');
-                    _detailProModel.updateListProNa(widget.proName,
-                        naController.text, StringUtils.isNotEmpty(posController.text)
+                    _detailProModel.updateListProNa(
+                        widget.proName,
+                        naController.text,
+                        StringUtils.isNotEmpty(posController.text)
                             ? int.parse(posController.text)
                             : -1);
                   }
@@ -78,19 +82,18 @@ class TimeListState extends State<TimeListEditView> {
               } else {
                 print('新建');
                 _currentModel
-                    .createListPro(
-                    proController.text,
-                    naController.text,
-                    Constant.txt_ctp,
-                    json.encode(_currentModel.list))
+                    .createListPro(proController.text, naController.text,
+                        Constant.time, json.encode(_currentModel.list))
                     .then((value) {
                   if (value) {
                     Toast.show('创建成功');
+                    _detailProModel.addListPro(proController.text,
+                        naController.text, Constant.time_list_pro,
+                        list: _currentModel.list);
                     NavigatorUtils.goBackWithParams(context, true);
                   }
                 });
               }
-
             },
           )
         ],
@@ -101,22 +104,6 @@ class TimeListState extends State<TimeListEditView> {
           if (StringUtils.isNotEmpty(widget.proName)) model.initData();
         },
         builder: (context, model, child) {
-          if (model.isBusy) {
-            return SkeletonList(
-              builder: (context, index) => ArkSkeletonItem(),
-            );
-          } else if (model.isError && model.list.isEmpty) {
-            return ViewStateErrorWidget(
-              error: model.viewStateError,
-              onPressed: model.initData(),
-            );
-          } else if (model.isEmpty) {
-            return ViewStateEmptyWidget(
-              onPressed: ()  {
-                model.initData();
-              },
-            );
-          }
           _currentModel = model;
           return Flex(
             direction: Axis.vertical,
@@ -325,7 +312,8 @@ class TimeListState extends State<TimeListEditView> {
       flex: 1,
       child: SmartRefresher(
         controller: model.refreshController,
-        enablePullUp: true,
+        enablePullUp: StringUtils.isNotEmpty(widget.proName),
+        enablePullDown: StringUtils.isNotEmpty(widget.proName),
         header: WaterDropHeader(),
         footer: RefresherFooter(),
         onRefresh: model.refresh,

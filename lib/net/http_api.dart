@@ -85,7 +85,7 @@ class HttpApi {
 
   static const String bftable_create = '/api/v1/xadmin/object/bftable/create';
 
-  static const String bftable_edit_pro='/api/v1/xadmin/object/bftable/edit';
+  static const String bftable_edit_pro = '/api/v1/xadmin/object/bftable/edit';
 
   ///==========================列表属性=================================
   ///
@@ -94,7 +94,7 @@ class HttpApi {
       '/api/v1/xadmin/object/property/pagination';
 
   /// 列表属性添加
-  static const String property_add = '/api/v1/xadmin/object/property/add';
+  static const String property_add = 'api/v1/xadmin/object/property/add';
 
   /// 列表属性修改
   static const String property_edit = '/api/v1/xadmin/object/property/edit';
@@ -122,5 +122,37 @@ class HttpApi {
       'api/v1/xadmin/resource_proxy/generate_group_id/';
 
   /// 上传资源服务器
-  static const String up_resource='/resource/up_resource/';
+  static const String up_resource = '/resource/up_resource/';
+
+  /// 列表属性删除
+  static const String propertyDelete = 'api/v1/xadmin/object/property/delete';
+
+  ///  ====================================关联相关================================///
+  ///  获取指定对象所有关联概念
+  static const String relatedConcept = 'api/v1/xadmin/object/related_concept/';
+
+  /// 对象关联页获取增强
+  static const String objectRelated = 'api/v1/xadmin/object/related/';
+
+  /// 添加关联
+  static const String relationLabelAdd = 'api/v1/xadmin/relation/label/add';
+
+  /// 移除关联
+  static const String relLabelRemove = 'api/v1/xadmin/relation/label/remove';
+
+  /// 创建关联
+  static const String relationCreate = 'api/v1/xadmin/relation/create/';
+
+  static const String relationAdd = 'api/v1/xadmin/relation/add/';
+
+  ///=================================用户============================
+
+  /// 创建用户
+  static const String createUser = 'api/v1/xadmin/user/create/';
+
+  /// 已创建用户
+  static const String existingUsers = 'api/v1/xadmin/users/';
+
+  /// 项目权限查看
+  static const String permissionProject = 'api/v1/xadmin/perssion/project/';
 }

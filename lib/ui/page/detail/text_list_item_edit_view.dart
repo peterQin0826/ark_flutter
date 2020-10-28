@@ -293,10 +293,10 @@ class TextListItemEditViewState extends State<TextListItemEditView> {
                           padding: EdgeInsets.only(left: 15, bottom: 5),
                           child: TextField(
                             controller: contentController,
-                            keyboardType: widget.type == Constant.file
+                            keyboardType: widget.type == Constant.time
                                 ? TextInputType.number
                                 : TextInputType.text,
-                            inputFormatters: widget.type == Constant.file
+                            inputFormatters: widget.type == Constant.time
                                 ? [MyNumberTextInputFormatter(digit: 5)]
                                 : null,
                           ),
@@ -360,11 +360,14 @@ class TextListItemEditViewState extends State<TextListItemEditView> {
     print('组装数据 ${json.encode(widget.dt.infos)}');
     String _info = json.encode(map);
 
+    widget.dt.title = titleController.text;
+    widget.dt.info = _info;
+    widget.dt.time = DateUtils.currentTimeMillis();
+
     if (widget.proName.isNotEmpty) {
       if (widget.dt.content.isNotEmpty) {
+
         widget.dt.content = contentController.text;
-        widget.dt.title = titleController.text;
-        widget.dt.info = _info;
 
         print('==========更新===========');
 
@@ -380,8 +383,6 @@ class TextListItemEditViewState extends State<TextListItemEditView> {
         });
       } else {
         widget.dt.content = contentController.text;
-        widget.dt.title = titleController.text;
-        widget.dt.info = _info;
 
         /// 添加
         print('==========添加===========');
@@ -397,8 +398,8 @@ class TextListItemEditViewState extends State<TextListItemEditView> {
         });
       }
     } else {
-      /// 新建属性    eventbus 传递到上个页面
-
+      widget.dt.content = contentController.text;
+      NavigatorUtils.goBackWithParams(context, widget.dt);
     }
   }
 }
