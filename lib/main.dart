@@ -31,7 +31,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp() {
     Log.init();
-    final router = Router();
+    final router = FluroRouter();
     Routers.configureRoutes(router);
     Application.router = router;
   }

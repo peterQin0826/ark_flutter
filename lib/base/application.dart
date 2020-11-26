@@ -9,6 +9,6 @@ import 'package:flustars/flustars.dart';
 import 'dart:io';
 
 class Application{
-  static Router router;
+  static FluroRouter router;
 
 }
