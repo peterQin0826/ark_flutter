@@ -43,7 +43,7 @@ class MyNumberTextInputFormatter extends TextInputFormatter {
     }
     return new TextEditingValue(
       text: value,
-      selection: new TextSelection.collapsed(offset: selectionIndex),
+      selection: new TextSelection.collapsed(int: selectionIndex),
     );
   }
 }

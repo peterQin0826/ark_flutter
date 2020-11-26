@@ -109,7 +109,7 @@ class DirectoryWidgetState extends State<DirectoryWidget> with SingleTickerProvi
   void initState() {
     animationController=new AnimationController(
         duration: Duration(seconds: 1),
-        vsync:this
+        value:this
     );
 
     super.initState();

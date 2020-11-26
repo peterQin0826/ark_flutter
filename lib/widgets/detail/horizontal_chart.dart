@@ -61,21 +61,15 @@ class HorizontalChartState extends State<HorizontalChart> {
     return <ChartSeries<_ChartData, String>>[
       SplineAreaSeries<_ChartData, String>(
         /// To set the gradient colors for border here.
-        borderGradient: const LinearGradient(colors: <Color>[
+        borderGradient: LinearGradient(List: <Color>[
           Color.fromRGBO(18, 70, 255, 1),
           Color.fromRGBO(18, 70, 255, 1)
-        ], stops: <double>[
-          0.2,
-          0.9
         ]),
 
         /// To set the gradient colors for series.
-        gradient: const LinearGradient(colors: <Color>[
+        gradient: LinearGradient(List: <Color>[
           Color.fromRGBO(225, 225, 225, 0.5),
           Color.fromRGBO(18, 70, 255, 0.64)
-        ], stops: <double>[
-          0.01,
-          0.5
         ], begin: Alignment.bottomCenter, end: Alignment.topCenter),
         borderWidth: 2,
         markerSettings: MarkerSettings(

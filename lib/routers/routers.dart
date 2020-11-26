@@ -31,7 +31,7 @@ class Routers {
   static const String short_pro_edit = '/short_pro_edit';
   static const String text_list_item = 'text_list_item_edit_view';
 
-  static void configureRoutes(Router router) {
+  static void configureRoutes( FluroRouter router) {
     /// 指定路由跳转错误返回页
     router.notFoundHandler = Handler(
         handlerFunc: (BuildContext context, Map<String, List<String>> params) {
